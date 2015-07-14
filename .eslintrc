@@ -1,0 +1,24 @@
+{
+  "env": {
+    "browser":  true,
+    "node":     true
+  },
+  "ecmaFeatures": {
+    "blockBindings": true,
+    "classes": true,
+    "forOf": true
+  },
+  "rules": {
+    "quotes":               [1, "double"],
+    "no-multi-spaces":      [0],
+    "semi":                 [1, "never"],
+    "strict":               [0],
+    "camelcase":            [0],
+    "no-path-concat":       [0],
+    "no-use-before-define": [0],
+    "space-infix-ops":      [0],
+    "eqeqeq":               [0],
+    "key-spacing":          [0],
+    "curly":                [1, "multi-line"]
+  }
+}

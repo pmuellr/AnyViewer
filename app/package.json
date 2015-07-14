@@ -1,0 +1,5 @@
+{
+  "name":        "AnyViewer",
+  "productName": "AnyViewer",
+  "main":        "main/main.js"
+}
