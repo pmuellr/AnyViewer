@@ -8,7 +8,7 @@ const AppDir = path.dirname(path.dirname(path.dirname(__dirname)))
 
 //------------------------------------------------------------------------------
 exports.toHTML     = toHTML
-exports.extensions = Extensions.slice()
+exports.extensions = [".md", ".markdown"]
 
 //------------------------------------------------------------------------------
 configureMarked()
@@ -28,6 +28,8 @@ function toHTML(vinylIn, vinylOut, cb) {
   output.push("</div>")
 
   fs.writeFileSync(oFile, output.join("\n"))
+
+  cb(null)
 }
 
 //------------------------------------------------------------------------------

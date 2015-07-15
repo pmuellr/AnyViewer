@@ -12,7 +12,7 @@ const throttleDebounce = require("throttle-debounce")
 const pkg      = require("../package.json")
 const menus    = require("./menus")
 const utils    = require("./utils")
-const markdown = require("./markdown")
+const plugins  = require("./plugins")
 
 //------------------------------------------------------------------------------
 exports.createViewer               = createViewer
@@ -79,8 +79,20 @@ class Viewer {
   openFile() {
     // app.addRecentDocument(this.fullFileName)
 
-    markdown.render(this.fullFileName, this.htmlFileName)
+    const iFile = this.fullFileName
+    const oFile = this.htmlFileName
+    const prefs = this.prefs
+    const self  = this
 
+    plugins.renderHTML(iFile, oFile, prefs, function(err) {
+      if (err) return
+
+      self.open2()
+    })
+  }
+
+  //------------------------------------------------------------------------------
+  openFile2() {
     const opts = {
       width:              this.prefs.data.window_width,
       height:             this.prefs.data.window_height,
@@ -133,7 +145,7 @@ class Viewer {
     const hContent = fs.readFileSync(this.htmlFileName, "utf8")
 
     // this.browserWindow.reload()
-    this.runScript("window.mdViewer.reload(" + JSON.stringify(hContent) + ")")
+    this.runScript("window.AnyViewer.reload(" + JSON.stringify(hContent) + ")")
   }
 
   //------------------------------------------------------------------------------

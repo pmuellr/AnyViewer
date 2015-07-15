@@ -2,10 +2,23 @@
 
 "use strict"
 
+exports.callOnce   = callOnce
 exports.i2a        = i2a
 exports.clone      = clone
 exports.dumpMap    = dumpMap
 exports.htmlEscape = htmlEscape
+
+//------------------------------------------------------------------------------
+function callOnce(fn) {
+  let called = false
+
+  return function() {
+    if (called) return
+    called = true
+
+    return fn.call(this, arguments)
+  }
+}
 
 //------------------------------------------------------------------------------
 function i2a(iterator) {

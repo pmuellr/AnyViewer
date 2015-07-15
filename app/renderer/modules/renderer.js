@@ -7,10 +7,10 @@
 const shell    = require("shell")
 const webFrame = require("web-frame")
 
-window.mdViewer = {}
-window.mdViewer.reload        = reload
-window.mdViewer.openLink      = openLink
-window.mdViewer.setZoomFactor = setZoomFactor
+window.AnyViewer = {}
+window.AnyViewer.reload        = reload
+window.AnyViewer.openLink      = openLink
+window.AnyViewer.setZoomFactor = setZoomFactor
 
 //------------------------------------------------------------------------------
 function reload(content) {

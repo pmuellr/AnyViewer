@@ -80,11 +80,8 @@ class HandlerClass {
   //-----------------------------------
   onOpenFileMenu() {
     const options = {
-      title:        "Open Markdown File",
+      title:        "Open File",
       defaultPath:  process.env.HOME,
-      filters:      [
-        { name: "Markdown files", extensions: ["md", "markdown"] }
-      ],
       properties: [ "openFile" ]
     }
 
@@ -167,7 +164,7 @@ function getZoomFactor(viewer) {
 function setZoomFactor(viewer, zoomFactor) {
   if (!viewer) return
 
-  viewer.runScript("window.mdViewer.setZoomFactor(" + zoomFactor + ")")
+  viewer.runScript("window.AnyViewer.setZoomFactor(" + zoomFactor + ")")
   viewer.zoomFactor = zoomFactor
 
   viewer.prefs.data.window_zoomFactor = zoomFactor

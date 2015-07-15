@@ -94,7 +94,7 @@ function getPrefsPath() {
 function getPrefsPathUnixy() {
   const homePath = process.env.HOME || process.env.USERPROFILE
 
-  return path.join(homePath, ".mb-viewer")
+  return path.join(homePath, ".AnyViewer")
 }
 
 //------------------------------------------------------------------------------

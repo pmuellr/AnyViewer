@@ -1,5 +1,0 @@
-{
-  "name":         "avpi-markdown",
-  "description":  "AnyViewer plugin for Markdown",
-  "plugin":       "./plugin"
-}

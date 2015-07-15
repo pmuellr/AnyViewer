@@ -1,5 +1,7 @@
 {
   "name":         "avpi-source-code",
   "description":  "AnyViewer plugin for source code highlighting",
-  "plugin":       "./plugin"
+  "AnyViewer": {
+    "plugin":     "./plugin"
+  }
 }
