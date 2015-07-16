@@ -2,9 +2,11 @@
 
 "use strict"
 
-const fs   = require("fs")
-const path = require("path")
+const fs     = require("fs")
+const path   = require("path")
+const dialog = require("dialog")
 
+const Vinyl            = require("vinyl")
 const tempfile         = require("tempfile")
 const BrowserWindow    = require("browser-window")
 const throttleDebounce = require("throttle-debounce")
@@ -70,29 +72,34 @@ class Viewer {
     this.fullFileName = getFullFileName(fileName)
     this.relFileName  = getRelFileName(fileName)
     this.htmlFileName = getHtmlFileName(fileName)
-    this.zoomFactor    = this.prefs.data.window_zoomFactor
+    this.tempFileName = this.htmlFileName
+    this.zoomFactor   = this.prefs.data.window_zoomFactor
 
-    this.openFile()
+    this.renderFile(this.openFile.bind(this))
   }
 
   //------------------------------------------------------------------------------
-  openFile() {
+  renderFile(next) {
+    // console.log("viewer.renderFile(" + next + ")")
+
+    const iVinyl = new Vinyl({path: this.fullFileName})
+    const oVinyl = new Vinyl({path: this.htmlFileName})
+    const prefs  = this.prefs
+
     // app.addRecentDocument(this.fullFileName)
 
-    const iFile = this.fullFileName
-    const oFile = this.htmlFileName
-    const prefs = this.prefs
-    const self  = this
+    const viewer = this
 
-    plugins.renderHTML(iFile, oFile, prefs, function(err) {
-      if (err) return
+    plugins.renderHTML(iVinyl, oVinyl, prefs, function(err) {
+      viewer.htmlFileName = oVinyl.path
 
-      self.open2()
+      next(err)
     })
   }
 
   //------------------------------------------------------------------------------
-  openFile2() {
+  openFile(err) {
+    // console.log("viewer.openFile(" + err + ")")
     const opts = {
       width:              this.prefs.data.window_width,
       height:             this.prefs.data.window_height,
@@ -128,6 +135,8 @@ class Viewer {
     browserWindow.on("resize", function() { onResizeDebounced() })
 
     browserWindow.webContents.on("did-finish-load", function() {
+      if (err) viewer.loadFileContent(err)
+
       viewer.didFinishLoad()
     })
 
@@ -139,13 +148,18 @@ class Viewer {
   }
 
   //------------------------------------------------------------------------------
+  loadFileContent(err) {
+    if (err) {
+      dialog.showErrorBox("error processing file", err.stack)
+      return
+    }
+
+    this.browserWindow.reload()
+  }
+
+  //------------------------------------------------------------------------------
   reload() {
-    markdown.render(this.fullFileName, this.htmlFileName)
-
-    const hContent = fs.readFileSync(this.htmlFileName, "utf8")
-
-    // this.browserWindow.reload()
-    this.runScript("window.AnyViewer.reload(" + JSON.stringify(hContent) + ")")
+    this.renderFile(this.loadFileContent.bind(this))
   }
 
   //------------------------------------------------------------------------------
@@ -176,7 +190,13 @@ class Viewer {
   //----------------------------------------------------------------------------
   onClosed() {
     ViewersOpen.delete(this.fileName)
-    fs.unlinkSync(this.htmlFileName)
+
+    try {
+      fs.unlinkSync(this.tempFileName)
+    }
+    catch (e) {
+      // console.log("error deleting file `" + this.tempFileName + "`: " + e)
+    }
   }
 
   //----------------------------------------------------------------------------

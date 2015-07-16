@@ -2,21 +2,21 @@
 
 "use strict"
 
-exports.callOnce   = callOnce
 exports.i2a        = i2a
 exports.clone      = clone
 exports.dumpMap    = dumpMap
 exports.htmlEscape = htmlEscape
+exports.onlyCallOnce   = onlyCallOnce
 
 //------------------------------------------------------------------------------
-function callOnce(fn) {
+function onlyCallOnce(fn) {
   let called = false
 
   return function() {
-    if (called) return
+    if (called) return null
     called = true
 
-    return fn.call(this, arguments)
+    return fn.apply(this, arguments)
   }
 }
 

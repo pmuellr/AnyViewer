@@ -2,25 +2,12 @@
 
 "use strict"
 
-/*global $*/
-
 const shell    = require("shell")
 const webFrame = require("web-frame")
 
 window.AnyViewer = {}
-window.AnyViewer.reload        = reload
 window.AnyViewer.openLink      = openLink
 window.AnyViewer.setZoomFactor = setZoomFactor
-
-//------------------------------------------------------------------------------
-function reload(content) {
-  const scrX = window.scrollX
-  const scrY = window.scrollY
-
-  $(".markdown-body").html(content)
-
-  window.scrollTo(scrX, scrY)
-}
 
 //------------------------------------------------------------------------------
 function openLink(href) {

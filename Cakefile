@@ -25,12 +25,19 @@ taskBuild = ->
   eslint "app", {silent: true}, (code, output) =>
     console.log(output)
 
-    platArch              = "#{process.platform}-#{process.arch}"
+    platArch = "#{process.platform}-#{process.arch}"
 
     if platArch is "darwin-x64"
       mkdir "-p", "build/#{platArch}"
 
+      build_darwin_x64 "build/#{platArch}", "AnyViewer-build"
       build_darwin_x64 "build/#{platArch}", "AnyViewer"
+
+      origDir = pwd()
+      log "building distribution archive"
+      cd "build/#{platArch}"
+      exec "zip -dd -1 -q -y -r ../AnyViewer-#{platArch}-#{pkg.version}.zip AnyViewer.app"
+      cd origDir
 
     log "build done."
 
@@ -81,7 +88,7 @@ fixAboutFile = (aboutFile)->
 
 #-------------------------------------------------------------------------------
 build_darwin_x64 = (dir, name)->
-  log "building #{path.relative process.cwd(), dir} ..."
+  log "building #{path.relative process.cwd(), path.join(dir, name)} ..."
 
   iDir = "node_modules/electron-prebuilt/dist"
   oDir = dir

@@ -49,6 +49,8 @@ function getTemplate() {
     {
       label: "View",
       submenu: [
+        { label: "Back",            accelerator: "Command+[",     on_click: "onGoBack" },
+        { label: "Forward",         accelerator: "Command+]",     on_click: "onGoForward" },
         { label: "Reload",          accelerator: "Command+R",     on_click: "onReload" },
         { label: "Enter Fullscreen",                              on_click: "onEnterFullscreen" },
         { label: "Actual Size",     accelerator: "Command+0",     on_click: "onZoomActualSize" },
@@ -75,6 +77,16 @@ class HandlerClass {
   //-----------------------------------
   constructor(menu) {
     this.menu = menu
+  }
+
+  //-----------------------------------
+  onGoBack() {
+    this.menu.browserWindow.webContents.goBack()
+  }
+
+  //-----------------------------------
+  onGoForward() {
+    this.menu.browserWindow.webContents.goForward()
   }
 
   //-----------------------------------

@@ -2,10 +2,10 @@
 
 "use strict"
 
-const fs = require("fs")
+const fs   = require("fs")
+const path = require("path")
 
 const _     = require("underscore")
-const vinyl = require("vinyl")
 
 const utils = require("./utils")
 
@@ -16,59 +16,119 @@ const Plugins    = new Map()
 const Extensions = new Map()
 
 //------------------------------------------------------------------------------
-function renderHTML(iFile, oFile, prefs, cb) {
-  const cb = utils.callOnce(cb)
+function renderHTML(iVinyl, oVinyl, prefs, cb) {
+  cb = utils.onlyCallOnce(cb)
 
-  initializeIfRequired(prefs)
+  initializeIfRequired()
 
-  const iVinyl = vinyl({path: iFile})
-  const oVinyl = vinyl({path: oFile})
+  const plugin = Extensions.get(iVinyl.extname)
+  if (!plugin) pitch("no plugin for extension " + iVinyl.extname)
 
-  const plugin = Extensions(iVinyl.extname)
-  if (!plugin) return cb(new Error("no plugin for extension " iVinyl.extname))
-
-  try { plugin.toHTML(iVinyl, oVinyl, cb) }
-  catch (e) { return cb(e) }
+  try {
+    plugin.toHTML(iVinyl, oVinyl, cb)
+  }
+  catch(e) {
+    return cb(e)
+  }
 
   cb(null)
 }
 
 //------------------------------------------------------------------------------
 let Initialized = false
-function initializeIfRequired(prefs) {
+function initializeIfRequired() {
   if (Initialized) return
   Initialized = true
 
-  loadPlugins(__dirname + "/../plugins")
-  loadPlugins(prefs.getPrefsPath() + "/plugins")
+  loadPlugins("core", path.join(__dirname, "..", "plugins"))
+  loadPlugins("user", path.join(require("./prefs").getPrefsPath(), "plugins"))
 }
 
 //------------------------------------------------------------------------------
-function loadPlugins(dir) {
-  const entries = fs.readdirSync(dir)
+function loadPlugins(type, dir) {
+  let entries
+  try {
+    entries = fs.readdirSync(dir)
+  }
+  catch (e) {
+    console.log("error reading directory `" + dir + "`: " + e)
+    return
+  }
 
   for (let entry of entries) {
-    const stat = fs.statSync(dir + "/" + entry)
+    let   stat
+    const entryName = path.join(dir, entry)
+
+    try {
+      stat = fs.statSync(entryName)
+    }
+    catch (e) {
+      console.log("error stat'ing plugin thing `" + entryName + "`: " + e)
+      continue
+    }
+
     if (!stat.isDirectory()) continue
 
-    const pFile = dir + "/" + entry + "/package.json"
-    const pJSON = fs.readFileSync(pFile, "utf8")
+    let   pkgJSON
+    const pkgName = path.join(dir, entry, "package.json")
+
+    try {
+      pkgJSON = fs.readFileSync(pkgName, "utf8")
+    }
+    catch (e) {
+      console.log("error reading plugin package `" + pkgName + "`: " + e)
+      continue
+    }
 
     let pkg = null
-    try { pkg = JSON.parse(pJSON) }
-    catch (e) {}
+    try {
+      pkg = JSON.parse(pkgJSON)
+    }
+    catch (e) {
+      console.log("error parsing plugin package `" + pkgName + "`: " + e)
+      continue
+    }
 
-    if (!pkg) continue
-    if (!pkg.AnyViewer) continue
-    if (!pkg.AnyViewer.plugin) continue
+    if (!pkg) {
+      console.log("empty package `" + pkgName + "`")
+      continue
+    }
 
-    let plugin = null
-    try { plugin = require(dir + "/" + entry + "/" + pkg.AnyViewer.plugin) }
-    catch (e) {}
+    if (!pkg.AnyViewer) {
+      console.log("package does not have an AnyViewer property `" + pkgName + "`")
+      continue
+    }
 
-    if (!plugin) continue
-    if (!_.isFunction(plugin.toHTML)) continue
-    if (!_.isArray(plugin.extensions)) continue
+    if (!pkg.AnyViewer.plugin) {
+      console.log("package does not have an AnyViewer.plugin property `" + pkgName + "`")
+      continue
+    }
+
+    let plugin     = null
+    let pluginName = path.join(dir, entry, pkg.AnyViewer.plugin)
+
+    try {
+      plugin = require(pluginName)
+    }
+    catch (e) {
+      console.log("error loading plugin `" + pluginName + "`: " + e)
+      continue
+    }
+
+    if (!plugin) {
+      console.log("plugin exports nothing `" + pluginName + "`:")
+      continue
+    }
+
+    if (!_.isFunction(plugin.toHTML))  {
+      console.log("plugin does't export a toHTML() function `" + pluginName + "`")
+      continue
+    }
+
+    if (!_.isArray(plugin.extensions)) {
+      console.log("plugin does't export an extensions array `" + pluginName + "`")
+      continue
+    }
 
     Plugins.set(entry, plugin)
 
@@ -76,6 +136,10 @@ function loadPlugins(dir) {
       Extensions.set(ext, plugin)
     }
   }
+}
+
+function pitch(string) {
+  throw new Error(string)
 }
 
 //------------------------------------------------------------------------------

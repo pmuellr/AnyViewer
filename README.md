@@ -8,6 +8,12 @@ AnyViewer is a desktop application to view files.  The application only displays
 HTML, so AnyViewer needs to be programmed to convert arbitrary files into HTML
 format, using a plugin.
 
+AnyViewer ships with plugins to handle HTML, Markdown, and source files that
+can be rendered by the
+[highlight.js package](https://www.npmjs.com/package/highlight.js) (the list
+of languages is available
+[here](https://github.com/isagalaev/highlight.js/tree/master/src/languages)).
+
 
 plugins
 --------------------------------------------------------------------------------
@@ -49,6 +55,12 @@ properties:
     function when you have finished writing the HTML back, passing `null`
     as `err` on success, else an Error object.
 
+  The path set in `vinylOut` is a temporary file name, which you can use
+  to generate HTML.  The file will be erased when the viewer window
+  closes.  But this is just a helper; you can also set `vinylOut.path` to
+  a file which should be loaded directly in the viewer as well.  See the
+  built-in HTML plugin for an example.
+
 * `extensions`: an array of strings of extensions supported by this plugin.
   Expected to include the `"."` character at the beginning of each string,
   like [vinyl's extname property](https://www.npmjs.com/package/vinyl#extname).
@@ -64,6 +76,9 @@ AnyViewer features
   as the default values for all future viewer windows.
 
 * You can open a Chrome Dev Tools window via menu and shortcut.
+
+* There are no forward/backward buttons available for history traversal,
+  but there are menu items and shortcuts for those functions.
 
 * A file which is being viewed is tracked for changes; when the file changes
   on disk, the view will be reloaded with the new contents.

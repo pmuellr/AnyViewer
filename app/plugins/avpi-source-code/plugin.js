@@ -2,32 +2,38 @@
 
 "use strict"
 
+const fs   = require("fs")
+const path = require("path")
+
 const highlight = require("highlight.js")
 
 //------------------------------------------------------------------------------
-const Extensions = initExtensions()
 const AppDir     = path.dirname(path.dirname(path.dirname(__dirname)))
+const Extensions = initExtensions()
+// const PluginName = path.basename(__dirname)
 
 exports.toHTML     = toHTML
 exports.extensions = Extensions.slice()
 
 //------------------------------------------------------------------------------
-function toHTML(vinylIn, vinylOut, cb) {
-  const extName = vinylIn.extname.slice(1).toLowerCase()
-  const lang    = highlight.getLanguage(extName)
-  const source  = getSource(vinylIn)
+function toHTML(iVinyl, oVinyl, cb) {
+  // console.log(PluginName + ".toHTML(", iVinyl, ",", oVinyl, ")")
+  const extName = iVinyl.extname.slice(1).toLowerCase()
+  const source  = getSource(iVinyl)
+  // console.log("  extName: ", extName)
 
   const output = []
-  output.push("<link rel='stylesheet' href='" + AppDir + "/node_modules/highlight.js/styles/github.css'>")
+  output.push("<link rel='stylesheet' href='" + AppDir + "/app/node_modules/highlight.js/styles/github.css'>")
+  output.push("<style>")
+  output.push("body, pre, xmp, tt, code {")
+  output.push(" font-family: Source Code Pro, Menlo, Monaco, Courier")
+  output.push("}")
+  output.push("</style>")
+  output.push("<pre>")
+  output.push(highlight.highlight(extName, source, true).value)
+  output.push("</pre>")
 
-  if (lang) {
-    output.push(highlight(lang, source, true).value)
-  }
-  else {
-    output.push(escapeHTML(source))
-  }
-
-  fs.writeFileSync(vinylOut.path, output.join("\n"))
+  fs.writeFileSync(oVinyl.path, output.join("\n"))
   cb(null)
 }
 
@@ -37,32 +43,35 @@ function getSource(vinyl) {
 }
 
 //------------------------------------------------------------------------------
+/*
 function escapeHTML(source) {
   source = source
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
 
   return "<pre>" + source + "</pre>"
 }
+*/
 
 //------------------------------------------------------------------------------
 function initExtensions() {
   const result = []
   const languages = highlight.listLanguages()
+  const skipExtensions = new Set("md markdown html".split(" "))
 
   for (let language of languages) {
-    if (language == "markdown") continue
+    if (skipExtensions.has(language)) continue
 
     result.push("." + language)
 
     const lang = highlight.getLanguage(language)
     if (lang.aliases) {
       for (let alias of lang.aliases) {
-        if (language == "html") continue
-        
+        if (skipExtensions.has(alias)) continue
+
         result.push("." + alias)
       }
     }
