@@ -1,0 +1,7 @@
+{
+  "name":         "avpi-txt",
+  "description":  "AnyViewer plugin for TXT files",
+  "AnyViewer": {
+    "plugin":     "./plugin"
+  }
+}

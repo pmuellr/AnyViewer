@@ -5,7 +5,7 @@ const marked    = require("marked")
 const highlight = require("highlight.js")
 
 const AppDir     = path.dirname(path.dirname(path.dirname(__dirname)))
-const PluginName = path.basename(__dirname)
+//const PluginName = path.basename(__dirname)
 
 //------------------------------------------------------------------------------
 exports.toHTML     = toHTML
@@ -16,8 +16,6 @@ configureMarked()
 
 //------------------------------------------------------------------------------
 function toHTML(iVinyl, oVinyl, cb) {
-  console.log(PluginName + ".toHTML(", iVinyl, ",", oVinyl, ")")
-
   const output = []
   const basePath = escapeHTML(iVinyl.path)
   const mContent = fs.readFileSync(iVinyl.path, "utf8")

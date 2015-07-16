@@ -72,7 +72,6 @@ class Viewer {
     this.fullFileName = getFullFileName(fileName)
     this.relFileName  = getRelFileName(fileName)
     this.htmlFileName = getHtmlFileName(fileName)
-    this.tempFileName = this.htmlFileName
     this.zoomFactor   = this.prefs.data.window_zoomFactor
 
     this.renderFile(this.openFile.bind(this))
@@ -88,13 +87,7 @@ class Viewer {
 
     // app.addRecentDocument(this.fullFileName)
 
-    const viewer = this
-
-    plugins.renderHTML(iVinyl, oVinyl, prefs, function(err) {
-      viewer.htmlFileName = oVinyl.path
-
-      next(err)
-    })
+    plugins.renderHTML(iVinyl, oVinyl, prefs, next)
   }
 
   //------------------------------------------------------------------------------
@@ -154,7 +147,8 @@ class Viewer {
       return
     }
 
-    this.browserWindow.reload()
+    const content = JSON.stringify(fs.readFileSync(this.htmlFileName, "utf8"))
+    this.runScript("window.AnyViewer.reload(" + content + ")")
   }
 
   //------------------------------------------------------------------------------
@@ -192,10 +186,10 @@ class Viewer {
     ViewersOpen.delete(this.fileName)
 
     try {
-      fs.unlinkSync(this.tempFileName)
+      fs.unlinkSync(this.htmlFileName)
     }
     catch (e) {
-      // console.log("error deleting file `" + this.tempFileName + "`: " + e)
+      // console.log("error deleting file `" + this.htmlFileName + "`: " + e)
     }
   }
 

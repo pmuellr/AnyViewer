@@ -1,7 +1,0 @@
-{
-  "name":         "avpi-html",
-  "description":  "AnyViewer plugin for HTML",
-  "AnyViewer": {
-    "plugin":     "./plugin"
-  }
-}

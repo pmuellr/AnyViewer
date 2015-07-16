@@ -57,9 +57,7 @@ properties:
 
   The path set in `vinylOut` is a temporary file name, which you can use
   to generate HTML.  The file will be erased when the viewer window
-  closes.  But this is just a helper; you can also set `vinylOut.path` to
-  a file which should be loaded directly in the viewer as well.  See the
-  built-in HTML plugin for an example.
+  closes.
 
 * `extensions`: an array of strings of extensions supported by this plugin.
   Expected to include the `"."` character at the beginning of each string,

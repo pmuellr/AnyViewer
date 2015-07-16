@@ -132,6 +132,29 @@ cfBundleFix = (name, iFile) ->
   pObj.CFBundleIconFile    = "AnyViewer.icns"
   pObj.CFBundleIdentifier  = "org.muellerware.#{name}"
   pObj.CFBundleVersion     = pkg.version
+  
+  pObj.CFBundleDocumentTypes = [
+    {
+      CFBundleTypeExtensions: [ "md" ],
+      CFBundleTypeIconFile: "AnyViewer.icns",
+      CFBundleTypeName:     "public.markdown",
+      CFBundleTypeRole:     "Viewer",
+      LSHandlerRank:        "Alternate",
+      LSItemContentTypes:   [ "public.markdown" ]
+    }
+  ]
+
+  pObj.UTImportedTypeDeclarations = [
+    {
+      UTTypeConformsTo: [ "public.data" ],
+      UTTypeIdentifier: "public.markdown",
+      UTTypeTagSpecification: {
+        "com.apple.ostype":          "markdown",
+        "public.filename-extension": [ "md" ],
+        "public.mime-type":          "text/markdown"
+      }
+    }
+	]
 
   plist.build(pObj).to iFile
 

@@ -2,36 +2,42 @@
 
 "use strict"
 
-const shell    = require("shell")
-const webFrame = require("web-frame")
-
-window.AnyViewer = {}
-window.AnyViewer.reload        = reload
-window.AnyViewer.openLink      = openLink
-window.AnyViewer.setZoomFactor = setZoomFactor
+const fs   = require("fs")
 
 //------------------------------------------------------------------------------
-function reload(newContent) {
-  const x = window.scrollX
-  const y = window.scrollY
+// const PluginName = path.basename(__dirname)
 
-  // document.location.reload(true)
+exports.toHTML     = toHTML
+exports.extensions = ".txt".split(" ")
 
-  const doc = document.open("text/html")
-  doc.write(newContent)
-  doc.close()
+//------------------------------------------------------------------------------
+function toHTML(iVinyl, oVinyl, cb) {
+  const source = fs.readFileSync(iVinyl.path, "utf8")
+  const output = []
 
-  window.scroll(x, y)
+  output.push("<style>")
+  output.push("body, pre, xmp, tt, code {")
+  output.push("  font-family: Source Code Pro, Menlo, Monaco, Courier")
+  output.push("}")
+  output.push("</style>")
+  output.push("<pre>")
+  output.push(escapeHTML(source))
+  output.push("</pre>")
+
+  fs.writeFileSync(oVinyl.path, output.join("\n"))
+  cb(null)
 }
 
 //------------------------------------------------------------------------------
-function openLink(href) {
-  shell.openExternal(href)
-}
+function escapeHTML(source) {
+  source = source
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
 
-//------------------------------------------------------------------------------
-function setZoomFactor(zoomFactor) {
-  webFrame.setZoomFactor(zoomFactor)
+  return "<pre>" + source + "</pre>"
 }
 
 //------------------------------------------------------------------------------
