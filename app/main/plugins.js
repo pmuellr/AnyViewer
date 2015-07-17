@@ -21,8 +21,14 @@ function renderHTML(iVinyl, oVinyl, prefs, cb) {
 
   initializeIfRequired()
 
-  const plugin = Extensions.get(iVinyl.extname)
-  if (!plugin) pitch("no plugin for extension " + iVinyl.extname)
+  const plugin = Extensions.get(iVinyl.extname.toLowerCase())
+  if (!plugin) {
+    let err = new Error("no plugin for extension")
+    err.longMessage =
+      "There is no plugin installed that can handle the extension `" + iVinyl.extname + "`"
+
+    throw err
+  }
 
   try {
     plugin.toHTML(iVinyl, oVinyl, cb)
@@ -136,10 +142,6 @@ function loadPlugins(type, dir) {
       Extensions.set(ext, plugin)
     }
   }
-}
-
-function pitch(string) {
-  throw new Error(string)
 }
 
 //------------------------------------------------------------------------------

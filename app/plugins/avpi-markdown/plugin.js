@@ -29,7 +29,6 @@ function toHTML(iVinyl, oVinyl, cb) {
   output.push("</div>")
 
   fs.writeFileSync(oVinyl.path, output.join("\n"))
-  console.log("")
 
   cb(null)
 }

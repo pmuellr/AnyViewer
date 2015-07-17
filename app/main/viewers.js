@@ -4,7 +4,6 @@
 
 const fs     = require("fs")
 const path   = require("path")
-const dialog = require("dialog")
 
 const Vinyl            = require("vinyl")
 const tempfile         = require("tempfile")
@@ -87,7 +86,12 @@ class Viewer {
 
     // app.addRecentDocument(this.fullFileName)
 
-    plugins.renderHTML(iVinyl, oVinyl, prefs, next)
+    try {
+      plugins.renderHTML(iVinyl, oVinyl, prefs, next)
+    }
+    catch (e) {
+      next(e)
+    }
   }
 
   //------------------------------------------------------------------------------
@@ -142,12 +146,29 @@ class Viewer {
 
   //------------------------------------------------------------------------------
   loadFileContent(err) {
-    if (err) {
-      dialog.showErrorBox("error processing file", err.stack)
-      return
+    let content = null
+
+    if (!err) {
+      content = fs.readFileSync(this.htmlFileName, "utf8")
     }
 
-    const content = JSON.stringify(fs.readFileSync(this.htmlFileName, "utf8"))
+    else {
+      content = []
+
+      content.push("<h1>Woops, error processing file: " + utils.htmlEscape(err.message) + "</h1>")
+      content.push("<p>file processed: '<tt>" + utils.htmlEscape(this.fullFileName) + "</tt>'")
+
+      if (err.longMessage) {
+        content.push("<p>" + utils.htmlEscape(err.longMessage))
+      }
+      else {
+        content.push("<pre>" + utils.htmlEscape(err.stack) + "</pre>")
+      }
+
+      content = content.join("\n")
+    }
+
+    content = JSON.stringify(content)
     this.runScript("window.AnyViewer.reload(" + content + ")")
   }
 
@@ -169,11 +190,15 @@ class Viewer {
 
   //----------------------------------------------------------------------------
   runScript(script) {
+    if (!this.browserWindow) return
+
     this.browserWindow.webContents.executeJavaScript(script)
   }
 
   //----------------------------------------------------------------------------
   show() {
+    if (!this.browserWindow) return
+
     this.browserWindow.show()
   }
 
@@ -185,16 +210,22 @@ class Viewer {
   onClosed() {
     ViewersOpen.delete(this.fileName)
 
+    fs.unwatchFile(this.fullFileName)
+
     try {
       fs.unlinkSync(this.htmlFileName)
     }
     catch (e) {
       // console.log("error deleting file `" + this.htmlFileName + "`: " + e)
     }
+
+    this.browserWindow = null
   }
 
   //----------------------------------------------------------------------------
   onResize() {
+    if (!this.browserWindow) return
+
     const size = this.browserWindow.getSize()
 
     this.prefs.data.window_width  = size[0]
