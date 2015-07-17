@@ -36,7 +36,7 @@ taskBuild = ->
       origDir = pwd()
       log "building distribution archive"
       cd "build/#{platArch}"
-      exec "zip -dd -1 -q -y -r ../AnyViewer-#{platArch}-#{pkg.version}.zip AnyViewer.app"
+      exec "zip -q -y -r ../AnyViewer-#{platArch}-#{pkg.version}.zip AnyViewer.app"
       cd origDir
 
     log "build done."
@@ -132,7 +132,7 @@ cfBundleFix = (name, iFile) ->
   pObj.CFBundleIconFile    = "AnyViewer.icns"
   pObj.CFBundleIdentifier  = "org.muellerware.#{name}"
   pObj.CFBundleVersion     = pkg.version
-  
+
   pObj.CFBundleDocumentTypes = [
     {
       CFBundleTypeExtensions: [ "md" ],
