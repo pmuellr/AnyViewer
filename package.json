@@ -1,6 +1,6 @@
 {
   "name":                 "AnyViewer",
-  "version":              "1.0.0",
+  "version":              "1.0.1",
   "description":          "a desktop Markdown viewer app built on Electron",
   "author":               "pmuellr",
   "main":                 "./lib/AnyViewer",

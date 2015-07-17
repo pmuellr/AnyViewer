@@ -2,13 +2,13 @@ AnyViewer - a programmable desktop file viewer built on Electron
 ================================================================================
 
 usage
-================================================================================
+--------------------------------------------------------------------------------
 
 AnyViewer is a desktop application to view files.  The application only displays
 HTML, so AnyViewer needs to be programmed to convert arbitrary files into HTML
 format, using a plugin.
 
-AnyViewer ships with plugins to handle HTML, Markdown, and source files that
+AnyViewer ships with plugins to handle Markdown, and source files that
 can be rendered by the
 [highlight.js package](https://www.npmjs.com/package/highlight.js) (the list
 of languages is available
@@ -80,10 +80,10 @@ AnyViewer features
 
 
 install
-================================================================================
+--------------------------------------------------------------------------------
 
 You can download a pre-built binary from the
-[releases page](https://github.com/AnyViewer/releases).
+[releases page](https://github.com/pmuellr/AnyViewer/releases).
 
 You can associate AnyViewer with particular file types, by following these
 instructions:
@@ -92,7 +92,7 @@ instructions:
 
 
 building
-================================================================================
+--------------------------------------------------------------------------------
 
 * clone this repo
 * run `npm install` to install dependencies
@@ -105,7 +105,7 @@ installed at the same time, on your boxen.
 
 
 hacking
-================================================================================
+--------------------------------------------------------------------------------
 
 This project uses [cake](http://coffeescript.org/#cake) as it's
 build tool.  To rebuild the project continuously, use the command
@@ -125,7 +125,7 @@ Run `npm run cake` to see the other commands available in the `Cakefile`.
 
 
 license
-================================================================================
+--------------------------------------------------------------------------------
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
