@@ -2,12 +2,10 @@
 
 "use strict"
 
-const shell    = require("shell")
 const webFrame = require("web-frame")
 
 window.AnyViewer = {}
 window.AnyViewer.reload        = reload
-window.AnyViewer.openLink      = openLink
 window.AnyViewer.setZoomFactor = setZoomFactor
 
 //------------------------------------------------------------------------------
@@ -22,11 +20,6 @@ function reload(newContent) {
   doc.close()
 
   window.scroll(x, y)
-}
-
-//------------------------------------------------------------------------------
-function openLink(href) {
-  shell.openExternal(href)
 }
 
 //------------------------------------------------------------------------------

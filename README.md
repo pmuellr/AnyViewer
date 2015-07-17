@@ -75,9 +75,6 @@ AnyViewer features
 
 * You can open a Chrome Dev Tools window via menu and shortcut.
 
-* There are no forward/backward buttons available for history traversal,
-  but there are menu items and shortcuts for those functions.
-
 * A file which is being viewed is tracked for changes; when the file changes
   on disk, the view will be reloaded with the new contents.
 

@@ -2,18 +2,21 @@
 
 "use strict"
 
-const fs     = require("fs")
-const path   = require("path")
+const fs   = require("fs")
+const URL  = require("url")
+const path = require("path")
+
+const shell         = require("shell")
+const BrowserWindow = require("browser-window")
 
 const Vinyl            = require("vinyl")
 const tempfile         = require("tempfile")
-const BrowserWindow    = require("browser-window")
 const throttleDebounce = require("throttle-debounce")
 
-const pkg      = require("../package.json")
-const menus    = require("./menus")
-const utils    = require("./utils")
-const plugins  = require("./plugins")
+const pkg     = require("../package.json")
+const menus   = require("./menus")
+const utils   = require("./utils")
+const plugins = require("./plugins")
 
 //------------------------------------------------------------------------------
 exports.createViewer               = createViewer
@@ -186,6 +189,18 @@ class Viewer {
 
   //----------------------------------------------------------------------------
   didFinishLoad() {
+    this.browserWindow.webContents.on("will-navigate", function(e, url) {
+      e.preventDefault()
+
+      const urlp = URL.parse(url)
+
+      if ((urlp.protocol == "http:") || (urlp.protocol == "https:")) {
+        shell.openExternal(url)
+      }
+      else if (urlp.protocol == "file:") {
+        shell.openItem(urlp.path)
+      }
+    })
   }
 
   //----------------------------------------------------------------------------
