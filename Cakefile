@@ -75,8 +75,8 @@ build_app = (oDir) ->
 
   rm "-R", "#{omDir}/jquery/src"
 
-  fixAboutFile "#{oDir}/renderer/about.html"
   fixAboutFile "#{oDir}/renderer/about.md"
+  cp "README.md", "#{oDir}/renderer/README.md"
 
 #-------------------------------------------------------------------------------
 fixAboutFile = (aboutFile)->

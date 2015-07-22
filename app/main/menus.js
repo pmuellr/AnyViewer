@@ -2,7 +2,7 @@
 
 "use strict"
 
-const Menu          = require("menu")
+const Menu  = require("menu")
 
 const _ = require("underscore")
 

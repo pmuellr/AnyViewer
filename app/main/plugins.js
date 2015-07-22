@@ -8,6 +8,7 @@ const path = require("path")
 const _     = require("underscore")
 
 const utils = require("./utils")
+const prefs = require("./prefs")
 
 //------------------------------------------------------------------------------
 exports.renderHTML = renderHTML
@@ -16,7 +17,7 @@ const Plugins    = new Map()
 const Extensions = new Map()
 
 //------------------------------------------------------------------------------
-function renderHTML(iVinyl, oVinyl, prefs, cb) {
+function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
   cb = utils.onlyCallOnce(cb)
 
   initializeIfRequired()
@@ -47,7 +48,7 @@ function initializeIfRequired() {
   Initialized = true
 
   loadPlugins("core", path.join(__dirname, "..", "plugins"))
-  loadPlugins("user", path.join(require("./prefs").getPrefsPath(), "plugins"))
+  loadPlugins("user", path.join(prefs.getPrefsBasePath(), "plugins"))
 }
 
 //------------------------------------------------------------------------------

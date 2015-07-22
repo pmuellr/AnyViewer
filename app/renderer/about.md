@@ -3,8 +3,11 @@ AnyViewer
 
 A programmable desktop file viewer built on Electron.
 
-For more information, see the source repo at GitHub:
-<https://github.com/pmuellr/AnyViewe>
+For more information, see:
+
+* the source repo at GitHub - <https://github.com/pmuellr/AnyViewer>
+* local version of the repo's [README.md](README.md)
+
 
 versions
 --------------------------------------------------------------------------------

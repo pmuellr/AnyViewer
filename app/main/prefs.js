@@ -5,6 +5,7 @@
 const fs   = require("fs")
 const path = require("path")
 
+const pkg = require("../package.json")
 const app = require("app")
 
 const _      = require("underscore")
@@ -12,9 +13,11 @@ const mkdirp = require("mkdirp")
 
 const PrefsFileName = getPrefsFileName("preferences.json")
 
+console.log("PrefsFileName: " + PrefsFileName)
+
 //------------------------------------------------------------------------------
-exports.create       = create
-exports.getPrefsPath = getPrefsPath
+exports.create           = create
+exports.getPrefsBasePath = getPrefsBasePath
 
 //------------------------------------------------------------------------------
 function create(defaultValues) { return new Prefs(defaultValues) }
@@ -68,33 +71,30 @@ class Prefs {
 
 //------------------------------------------------------------------------------
 function getPrefsFileName(baseName) {
-  const userDataPath = getPrefsPath()
+  const prefsBasePath = getPrefsBasePath()
 
   try {
-    mkdirp.sync(userDataPath)
+    mkdirp.sync(prefsBasePath)
   }
   catch(e) {
     return null
   }
 
-  return path.join(userDataPath, baseName)
+  return path.join(prefsBasePath, baseName)
 }
 
 //------------------------------------------------------------------------------
-function getPrefsPath() {
+function getPrefsBasePath() {
+  let basePath
+
   try {
-    return app.getPath("userData")
+    basePath = app.getPath("home")
   }
   catch(e) {
-    return getPrefsPathUnixy()
+    basePath = process.env.HOME || process.env.USERPROFILE
   }
-}
 
-//------------------------------------------------------------------------------
-function getPrefsPathUnixy() {
-  const homePath = process.env.HOME || process.env.USERPROFILE
-
-  return path.join(homePath, ".AnyViewer")
+  return path.join(basePath, "." + pkg.name)
 }
 
 //------------------------------------------------------------------------------
