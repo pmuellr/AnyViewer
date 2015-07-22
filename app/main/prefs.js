@@ -13,8 +13,6 @@ const mkdirp = require("mkdirp")
 
 const PrefsFileName = getPrefsFileName("preferences.json")
 
-console.log("PrefsFileName: " + PrefsFileName)
-
 //------------------------------------------------------------------------------
 exports.create           = create
 exports.getPrefsBasePath = getPrefsBasePath

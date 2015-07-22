@@ -87,8 +87,6 @@ class Viewer {
     const oVinyl = new Vinyl({path: this.htmlFileName})
     const prefs  = this.prefs
 
-    // app.addRecentDocument(this.fullFileName)
-
     try {
       plugins.renderHTML(iVinyl, oVinyl, prefs, next)
     }

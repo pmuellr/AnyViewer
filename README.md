@@ -21,9 +21,8 @@ plugins
 In order to have a custom HTML renderer for a particular file extension, you'll
 need to install a plugin.  A plugin is an node package installed in a particular
 location.  That location is the directory named `plugins` in the AnyViewer data
-directory.  The AnyViewer data directory is located at:
-
-* Mac OS X - `~/Library/Application Support/AnyViewer`
+directory.  The AnyViewer data directory in your home directory, named
+`.AnyViewer`, and stores other preference-y data.
 
 Each plugin should be in a separate directory, in the same vein as node's
 `node_modules` directory.  The `package.json` file for each package should have
@@ -56,12 +55,54 @@ properties:
     as `err` on success, else an Error object.
 
   The path set in `vinylOut` is a temporary file name, which you can use
-  to generate HTML.  The file will be erased when the viewer window
+  to generate HTML into.  The file will be erased when the viewer window
   closes.
 
 * `extensions`: an array of strings of extensions supported by this plugin.
   Expected to include the `"."` character at the beginning of each string,
   like [vinyl's extname property](https://www.npmjs.com/package/vinyl#extname).
+
+
+sample plugin
+--------------------------------------------------------------------------------
+
+By default, AnyViewer can view `.html` with syntax highlighting.  This sample
+plugin views `.html` file as the rendered HTML.  It's not terribly practical -
+this plugin does not fix relatively referenced resources (images, css files,
+etc), so those files won't be loaded when the HTML is rendered in Anyviewer.
+But, it's a simple example.
+
+These files should be stored in the directory `.AnyViewer/plugins/avpi-html`
+in your home directory.
+
+### file `package.json`
+
+```json
+{
+  "name":         "avpi-html",
+  "description":  "AnyViewer plugin for HTML",
+  "AnyViewer": {
+    "plugin":     "./plugin"
+  }
+}
+```
+
+### file `plugin.js`
+
+```js
+const fs = require("fs")
+
+exports.toHTML     = toHTML
+exports.extensions = [".html"]
+
+function toHTML(iVinyl, oVinyl, cb) {
+  const content = fs.readFileSync(iVinyl.path, "utf8")
+  fs.writeFileSync(oVinyl.path, content)
+
+  cb()
+}
+```
+
 
 AnyViewer features
 --------------------------------------------------------------------------------
@@ -78,6 +119,8 @@ AnyViewer features
 * A file which is being viewed is tracked for changes; when the file changes
   on disk, the view will be reloaded with the new contents.
 
+* Print files with background colors and images, with a font-size that
+  renders the text fairly readable on a tablet when printed to PDF file.
 
 install
 --------------------------------------------------------------------------------
@@ -101,7 +144,6 @@ building
 A "build" version of the executable is available in the `build` directory,
 to make it easier to test a development version while you have a stable version
 installed at the same time, on your boxen.
-
 
 
 hacking
