@@ -4,9 +4,10 @@ AnyViewer - a programmable desktop file viewer built on Electron
 usage
 --------------------------------------------------------------------------------
 
-AnyViewer is a desktop application to view files.  The application only displays
-HTML, so AnyViewer needs to be programmed to convert arbitrary files into HTML
-format, using a plugin.
+AnyViewer is a desktop application to view files, built on
+[Electron](http://electron.atom.io/).
+The application only displays HTML, so AnyViewer needs to be programmed to
+convert arbitrary files into HTML format, using a plugin.
 
 AnyViewer ships with plugins to handle Markdown, and source files that
 can be rendered by the
