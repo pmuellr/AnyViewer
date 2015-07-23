@@ -39,6 +39,18 @@ taskBuild = ->
       exec "zip -q -y -r ../AnyViewer-#{platArch}-#{pkg.version}.zip AnyViewer.app"
       cd origDir
 
+    if platArch is "linux-x64"
+      mkdir "-p", "build/#{platArch}"
+
+      build_linux_x64 "build/#{platArch}", "AnyViewer-build"
+      build_linux_x64 "build/#{platArch}", "AnyViewer"
+
+      origDir = pwd()
+      log "building distribution archive"
+      cd "build/#{platArch}"
+      exec "zip -q -y -r ../AnyViewer-#{platArch}-#{pkg.version}.zip AnyViewer"
+      cd origDir
+
     log "build done."
 
 #-------------------------------------------------------------------------------
@@ -121,6 +133,29 @@ build_darwin_x64 = (dir, name)->
   # rename the .app file
   rm "-Rf", "#{oDir}/#{name}.app"
   mv eoDir, "#{oDir}/#{name}.app"
+
+#-------------------------------------------------------------------------------
+build_linux_x64 = (dir, name)->
+  log "building #{path.relative process.cwd(), path.join(dir, name)} ..."
+
+  iDir = "node_modules/electron-prebuilt/dist"
+  oDir = "#{dir}/#{name}"
+
+  rm "-Rf", oDir
+
+  # copy electron, swizzle license/version names, locations
+  cp "-R", "#{iDir}/*", oDir
+  cp "#{iDir}/LICENSE", "#{oDir}/LICENSE-electron"
+  cp "#{iDir}/version", "#{oDir}/version-electron"
+
+  # remove default_app
+  rm "-rf", "#{oDir}/resources/default_app"
+
+  # build the app directory
+  build_app "#{oDir}/resources"
+
+  # rename the .app file
+  mv "#{oDir}/electron", "#{oDir}/#{name}"
 
 #-------------------------------------------------------------------------------
 cfBundleFix = (name, iFile) ->
