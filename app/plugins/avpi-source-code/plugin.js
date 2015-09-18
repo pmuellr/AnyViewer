@@ -76,14 +76,14 @@ function initExtensions() {
   for (let language of languages) {
     if (skipExtensions.has(language)) continue
 
-    result.push("." + language)
+    result.push(language)
 
     const lang = highlight.getLanguage(language)
     if (lang.aliases) {
       for (let alias of lang.aliases) {
         if (skipExtensions.has(alias)) continue
 
-        result.push("." + alias)
+        result.push(alias)
       }
     }
   }

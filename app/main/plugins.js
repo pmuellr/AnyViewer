@@ -22,11 +22,25 @@ function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
 
   initializeIfRequired()
 
-  const plugin = Extensions.get(iVinyl.extname.toLowerCase())
+  const exts = getExtensions(iVinyl)
+
+  let plugin
+  for (let i=0; i<exts.length; i++) {
+    plugin = Extensions.get(exts[i])
+    if (plugin) break
+  }
+
   if (!plugin) {
-    let err = new Error("no plugin for extension")
+    const errMessage = (exts.length == 1
+      ? "no plugin for extension " + exts[0]
+      : "no plugin for extensions " + exts.join(", ")
+    )
+
+    const err = new Error(errMessage)
     err.longMessage =
-      "There is no plugin installed that can handle the extension `" + iVinyl.extname + "`"
+      "There is no plugin installed that can handle the extensions `" +
+      exts.join(", ") +
+      "`"
 
     throw err
   }
@@ -39,6 +53,23 @@ function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
   }
 
   cb(null)
+}
+
+//------------------------------------------------------------------------------
+function getExtensions(vinyl) {
+  const regex = /^[^\.]*?\.(.*)/
+  const match = vinyl.basename.match(regex)
+  if (!match) return [ "" ]
+
+  const result = []
+
+  const parts = match[1].toLowerCase().split(".")
+  while (parts.length > 0) {
+    result.push(parts.join("."))
+    parts.shift()
+  }
+
+  return result
 }
 
 //------------------------------------------------------------------------------

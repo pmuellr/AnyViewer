@@ -8,7 +8,7 @@ const fs   = require("fs")
 // const PluginName = path.basename(__dirname)
 
 exports.toHTML     = toHTML
-exports.extensions = ".txt".split(" ")
+exports.extensions = "txt".split(" ")
 
 //------------------------------------------------------------------------------
 function toHTML(iVinyl, oVinyl, cb) {

@@ -9,7 +9,7 @@ const AppDir     = path.dirname(path.dirname(path.dirname(__dirname)))
 
 //------------------------------------------------------------------------------
 exports.toHTML     = toHTML
-exports.extensions = [".md", ".markdown"]
+exports.extensions = ["md", "markdown"]
 
 //------------------------------------------------------------------------------
 configureMarked()

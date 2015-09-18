@@ -60,8 +60,13 @@ properties:
   closes.
 
 * `extensions`: an array of strings of extensions supported by this plugin.
-  Expected to include the `"."` character at the beginning of each string,
-  like [vinyl's extname property](https://www.npmjs.com/package/vinyl#extname).
+  Should not include the `"."` character at the beginning of each string,
+  unlike [vinyl's extname property](https://www.npmjs.com/package/vinyl#extname).
+  You can provide "multi-part" extensions, so for instance the `extension`
+  array could be `["foo.md"]`, which would indicate that files of the form
+  `*.foo.md` would be handled by the plugin. In the case of two plugins,
+  one handling `["foo.md"]` and one handling `["md"]`, the one with the
+  most "parts" in it wins - `"foo.md"` in this case.
 
 
 sample plugin
@@ -94,7 +99,7 @@ in your home directory.
 const fs = require("fs")
 
 exports.toHTML     = toHTML
-exports.extensions = [".html"]
+exports.extensions = ["html"]
 
 function toHTML(iVinyl, oVinyl, cb) {
   const content = fs.readFileSync(iVinyl.path, "utf8")
