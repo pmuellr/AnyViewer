@@ -1,14 +1,15 @@
 // Licensed under the Apache License. See footer for details.
 
-"use strict"
+'use strict'
 
-const Menu  = require("menu")
+const Menu  = require('electron').Menu
 
-const _ = require("underscore")
+const _ = require('underscore')
 
-const viewers  = require("./viewers")
-const utils    = require("./utils")
-const MenuData = require("./menu-data")
+const logger   = require('./logger')(__filename)
+const viewers  = require('./viewers')
+const utils    = require('./utils')
+const MenuData = require('./menu-data')
 
 //------------------------------------------------------------------------------
 exports.loadAppMenu    = loadAppMenu
@@ -102,7 +103,7 @@ function setMenuHandlers(menuData, handler) {
   for (let propName in menuData) {
     const propVal = menuData[propName]
 
-    if (propName == "on_click") {
+    if (propName == 'on_click') {
       menuData.click = getMenuHandlerMethod(handler, propVal)
     }
 
@@ -120,7 +121,7 @@ function getMenuHandlerMethod(handler, name) {
     const args = _.toArray(arguments)
 
     if (fn == null) {
-      console.log("click handler method '" + name + "' not found.")
+      console.log('click handler method "' + name + '" not found.')
       return
     }
 
@@ -129,14 +130,14 @@ function getMenuHandlerMethod(handler, name) {
 }
 
 //------------------------------------------------------------------------------
-// Licensed under the Apache License, Version 2.0 (the "License")
+// Licensed under the Apache License, Version 2.0 (the 'License')
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.

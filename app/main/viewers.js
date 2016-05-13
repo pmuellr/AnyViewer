@@ -1,22 +1,23 @@
 // Licensed under the Apache License. See footer for details.
 
-"use strict"
+'use strict'
 
-const fs   = require("fs")
-const URL  = require("url")
-const path = require("path")
+const fs   = require('fs')
+const URL  = require('url')
+const path = require('path')
 
-const shell         = require("shell")
-const BrowserWindow = require("browser-window")
+const shell         = require('electron').shell
+const BrowserWindow = require('electron').BrowserWindow
 
-const Vinyl            = require("vinyl")
-const tempfile         = require("tempfile")
-const throttleDebounce = require("throttle-debounce")
+const Vinyl            = require('vinyl')
+const tempfile         = require('tempfile')
+const throttleDebounce = require('throttle-debounce')
 
-const pkg     = require("../package.json")
-const menus   = require("./menus")
-const utils   = require("./utils")
-const plugins = require("./plugins")
+const pkg     = require('../package.json')
+const logger  = require('./logger')(__filename)
+const menus   = require('./menus')
+const utils   = require('./utils')
+const plugins = require('./plugins')
 
 //------------------------------------------------------------------------------
 exports.createViewer               = createViewer
@@ -30,6 +31,8 @@ const ViewersOpen = new Map()
 
 //------------------------------------------------------------------------------
 function createViewer(fileName, options) {
+  logger.info('creating viewer for %s', fileName)
+
   const fullFileName = getFullFileName(fileName)
 
   if (ViewersOpen.has(fullFileName)) {
@@ -67,6 +70,8 @@ class Viewer {
 
   //----------------------------------------------------------------------------
   constructor(fileName, options) {
+    logger.info('creating Viewer for %s', fileName)
+
     this.fileName     = fileName
     this.prefs        = options.prefs
     this.title        = options.title
@@ -81,7 +86,7 @@ class Viewer {
 
   //------------------------------------------------------------------------------
   renderFile(next) {
-    // console.log("viewer.renderFile(" + next + ")")
+    logger.info('rendering file %s', this.fileName)
 
     const iVinyl = new Vinyl({path: this.fullFileName})
     const oVinyl = new Vinyl({path: this.htmlFileName})
@@ -91,19 +96,32 @@ class Viewer {
       plugins.renderHTML(iVinyl, oVinyl, prefs, next)
     }
     catch (e) {
-      next(e)
+      logger.error('error rendering file: ', e)
     }
   }
 
   //------------------------------------------------------------------------------
   openFile(err) {
-    // console.log("viewer.openFile(" + err + ")")
+    if (err) {
+      logger.error('error trying to open file' + this.fullFileName + ': ' + err)
+    }
+
+    try {
+      return this.openFile_(err)
+    } catch (err) {
+      logger.error('error opening file' + this.fullFileName + ': ' + err)
+    }
+  }
+
+  //------------------------------------------------------------------------------
+  openFile_ (err) {
+    logger.info('opening file %s', this.fullFileName)
     const opts = {
       width:              this.prefs.data.window_width,
       height:             this.prefs.data.window_height,
-      preload:            path.join(__dirname, "../renderer/modules/renderer.js"),
-      "node-integration": false,
-      "zoom-factor":      this.zoomFactor
+      preload:            path.join(__dirname, '../renderer/modules/renderer.js'),
+      'node-integration': false,
+      'zoom-factor':      this.zoomFactor
     }
 
     if (this.title)            { opts.title = this.title }
@@ -118,7 +136,7 @@ class Viewer {
     const windowMenu = menus.loadWindowMenu(this)
     browserWindow.setMenu(windowMenu)
 
-    browserWindow.loadUrl("file://" + this.htmlFileName)
+    browserWindow.loadURL('file://' + this.htmlFileName)
 
     if (this.fullFileName) {
       browserWindow.setRepresentedFilename(this.fullFileName)
@@ -128,11 +146,11 @@ class Viewer {
 
     const onResizeDebounced = debounce(1000, function() { viewer.onResize() })
 
-    browserWindow.on("close",  function() { viewer.onClose() })
-    browserWindow.on("closed", function() { viewer.onClosed() })
-    browserWindow.on("resize", function() { onResizeDebounced() })
+    browserWindow.on('close',  function() { viewer.onClose() })
+    browserWindow.on('closed', function() { viewer.onClosed() })
+    browserWindow.on('resize', function() { onResizeDebounced() })
 
-    browserWindow.webContents.on("did-finish-load", function() {
+    browserWindow.webContents.on('did-finish-load', function() {
       if (err) viewer.loadFileContent(err)
 
       viewer.didFinishLoad()
@@ -143,6 +161,8 @@ class Viewer {
     fs.watchFile(this.fullFileName, {interval: 1000}, function(curr, prev) {
       self.fileModified(curr, prev)
     })
+
+    logger.info('done opening file %s', this.fileName)
   }
 
   //------------------------------------------------------------------------------
@@ -150,27 +170,27 @@ class Viewer {
     let content = null
 
     if (!err) {
-      content = fs.readFileSync(this.htmlFileName, "utf8")
+      content = fs.readFileSync(this.htmlFileName, 'utf8')
     }
 
     else {
       content = []
 
-      content.push("<h1>Woops, error processing file: " + utils.htmlEscape(err.message) + "</h1>")
-      content.push("<p>file processed: '<tt>" + utils.htmlEscape(this.fullFileName) + "</tt>'")
+      content.push('<h1>Woops, error processing file: ' + utils.htmlEscape(err.message) + '</h1>')
+      content.push('<p>file processed: "<tt>' + utils.htmlEscape(this.fullFileName) + '</tt>"')
 
       if (err.longMessage) {
-        content.push("<p>" + utils.htmlEscape(err.longMessage))
+        content.push('<p>' + utils.htmlEscape(err.longMessage))
       }
       else {
-        content.push("<pre>" + utils.htmlEscape(err.stack) + "</pre>")
+        content.push('<pre>' + utils.htmlEscape(err.stack) + '</pre>')
       }
 
-      content = content.join("\n")
+      content = content.join('\n')
     }
 
     content = JSON.stringify(content)
-    this.runScript("window.AnyViewer.reload(" + content + ")")
+    this.runScript('window.AnyViewer.reload(' + content + ')')
   }
 
   //------------------------------------------------------------------------------
@@ -187,15 +207,15 @@ class Viewer {
 
   //----------------------------------------------------------------------------
   didFinishLoad() {
-    this.browserWindow.webContents.on("will-navigate", function(e, url) {
+    this.browserWindow.webContents.on('will-navigate', function(e, url) {
       e.preventDefault()
 
       const urlp = URL.parse(url)
 
-      if ((urlp.protocol == "http:") || (urlp.protocol == "https:")) {
+      if ((urlp.protocol == 'http:') || (urlp.protocol == 'https:')) {
         shell.openExternal(url)
       }
-      else if (urlp.protocol == "file:") {
+      else if (urlp.protocol == 'file:') {
         shell.openItem(urlp.path)
       }
     })
@@ -229,7 +249,7 @@ class Viewer {
       fs.unlinkSync(this.htmlFileName)
     }
     catch (e) {
-      // console.log("error deleting file `" + this.htmlFileName + "`: " + e)
+      // console.log('error deleting file `' + this.htmlFileName + '`: ' + e)
     }
 
     this.browserWindow = null
@@ -257,7 +277,7 @@ function debounce(ms, fn) {
 function getHtmlFileName(fileName) {
   if (!fileName) return null
 
-  const htmlTemp = tempfile(".AnyViewer.html")
+  const htmlTemp = tempfile('.AnyViewer.html')
 
   return htmlTemp
 }
@@ -279,20 +299,20 @@ function getRelFileName(fileName) {
   fileName = path.resolve(fileName)
 
   const relFileName = path.relative(home, fileName)
-  if (relFileName[0] == ".") return fileName
+  if (relFileName[0] == '.') return fileName
 
-  return path.join("~", relFileName)
+  return path.join('~', relFileName)
 }
 
 //------------------------------------------------------------------------------
-// Licensed under the Apache License, Version 2.0 (the "License")
+// Licensed under the Apache License, Version 2.0 (the 'License')
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.

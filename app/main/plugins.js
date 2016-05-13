@@ -1,14 +1,15 @@
 // Licensed under the Apache License. See footer for details.
 
-"use strict"
+'use strict'
 
-const fs   = require("fs")
-const path = require("path")
+const fs   = require('fs')
+const path = require('path')
 
-const _     = require("underscore")
+const _     = require('underscore')
 
-const utils = require("./utils")
-const prefs = require("./prefs")
+const logger = require('./logger')(__filename)
+const utils  = require('./utils')
+const prefs  = require('./prefs')
 
 //------------------------------------------------------------------------------
 exports.renderHTML = renderHTML
@@ -32,15 +33,15 @@ function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
 
   if (!plugin) {
     const errMessage = (exts.length == 1
-      ? "no plugin for extension " + exts[0]
-      : "no plugin for extensions " + exts.join(", ")
+      ? 'no plugin for extension ' + exts[0]
+      : 'no plugin for extensions ' + exts.join(', ')
     )
 
     const err = new Error(errMessage)
     err.longMessage =
-      "There is no plugin installed that can handle the extensions `" +
-      exts.join(", ") +
-      "`"
+      'There is no plugin installed that can handle the extensions `' +
+      exts.join(', ') +
+      '`'
 
     throw err
   }
@@ -59,13 +60,13 @@ function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
 function getExtensions(vinyl) {
   const regex = /^[^\.]*?\.(.*)/
   const match = vinyl.basename.match(regex)
-  if (!match) return [ "" ]
+  if (!match) return [ '' ]
 
   const result = []
 
-  const parts = match[1].toLowerCase().split(".")
+  const parts = match[1].toLowerCase().split('.')
   while (parts.length > 0) {
-    result.push(parts.join("."))
+    result.push(parts.join('.'))
     parts.shift()
   }
 
@@ -78,8 +79,8 @@ function initializeIfRequired() {
   if (Initialized) return
   Initialized = true
 
-  loadPlugins("core", path.join(__dirname, "..", "plugins"))
-  loadPlugins("user", path.join(prefs.getPrefsBasePath(), "plugins"))
+  loadPlugins('core', path.join(__dirname, '..', 'plugins'))
+  loadPlugins('user', path.join(prefs.getPrefsBasePath(), 'plugins'))
 }
 
 //------------------------------------------------------------------------------
@@ -89,7 +90,7 @@ function loadPlugins(type, dir) {
     entries = fs.readdirSync(dir)
   }
   catch (e) {
-    console.log("error reading directory `" + dir + "`: " + e)
+    console.log('error reading directory `' + dir + '`: ' + e)
     return
   }
 
@@ -101,20 +102,20 @@ function loadPlugins(type, dir) {
       stat = fs.statSync(entryName)
     }
     catch (e) {
-      console.log("error stat'ing plugin thing `" + entryName + "`: " + e)
+      console.log('error stating plugin thing `' + entryName + '`: ' + e)
       continue
     }
 
     if (!stat.isDirectory()) continue
 
     let   pkgJSON
-    const pkgName = path.join(dir, entry, "package.json")
+    const pkgName = path.join(dir, entry, 'package.json')
 
     try {
-      pkgJSON = fs.readFileSync(pkgName, "utf8")
+      pkgJSON = fs.readFileSync(pkgName, 'utf8')
     }
     catch (e) {
-      console.log("error reading plugin package `" + pkgName + "`: " + e)
+      console.log('error reading plugin package `' + pkgName + '`: ' + e)
       continue
     }
 
@@ -123,22 +124,22 @@ function loadPlugins(type, dir) {
       pkg = JSON.parse(pkgJSON)
     }
     catch (e) {
-      console.log("error parsing plugin package `" + pkgName + "`: " + e)
+      console.log('error parsing plugin package `' + pkgName + '`: ' + e)
       continue
     }
 
     if (!pkg) {
-      console.log("empty package `" + pkgName + "`")
+      console.log('empty package `' + pkgName + '`')
       continue
     }
 
     if (!pkg.AnyViewer) {
-      console.log("package does not have an AnyViewer property `" + pkgName + "`")
+      console.log('package does not have an AnyViewer property `' + pkgName + '`')
       continue
     }
 
     if (!pkg.AnyViewer.plugin) {
-      console.log("package does not have an AnyViewer.plugin property `" + pkgName + "`")
+      console.log('package does not have an AnyViewer.plugin property `' + pkgName + '`')
       continue
     }
 
@@ -149,22 +150,22 @@ function loadPlugins(type, dir) {
       plugin = require(pluginName)
     }
     catch (e) {
-      console.log("error loading plugin `" + pluginName + "`: " + e)
+      console.log('error loading plugin `' + pluginName + '`: ' + e)
       continue
     }
 
     if (!plugin) {
-      console.log("plugin exports nothing `" + pluginName + "`:")
+      console.log('plugin exports nothing `' + pluginName + '`:')
       continue
     }
 
     if (!_.isFunction(plugin.toHTML))  {
-      console.log("plugin does't export a toHTML() function `" + pluginName + "`")
+      console.log('plugin does not export a toHTML() function `' + pluginName + '`')
       continue
     }
 
     if (!_.isArray(plugin.extensions)) {
-      console.log("plugin does't export an extensions array `" + pluginName + "`")
+      console.log('plugin does not export an extensions array `' + pluginName + '`')
       continue
     }
 
@@ -177,14 +178,14 @@ function loadPlugins(type, dir) {
 }
 
 //------------------------------------------------------------------------------
-// Licensed under the Apache License, Version 2.0 (the "License")
+// Licensed under the Apache License, Version 2.0 (the 'License')
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.

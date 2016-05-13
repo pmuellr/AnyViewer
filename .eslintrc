@@ -3,13 +3,11 @@
     "browser":  true,
     "node":     true
   },
-  "ecmaFeatures": {
-    "blockBindings": true,
-    "classes": true,
-    "forOf": true
+  "parserOptions": {
+    "ecmaVersion": 6
   },
   "rules": {
-    "quotes":               [1, "double"],
+    "quotes":               [1, "single"],
     "no-multi-spaces":      [0],
     "semi":                 [1, "never"],
     "strict":               [0],

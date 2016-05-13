@@ -1,17 +1,19 @@
 // Licensed under the Apache License. See footer for details.
 
-"use strict"
+'use strict'
 
-const fs   = require("fs")
-const path = require("path")
+const fs   = require('fs')
+const path = require('path')
 
-const pkg = require("../package.json")
-const app = require("app")
+const app = require('electron').app
 
-const _      = require("underscore")
-const mkdirp = require("mkdirp")
+const _      = require('underscore')
+const mkdirp = require('mkdirp')
 
-const PrefsFileName = getPrefsFileName("preferences.json")
+const pkg    = require('../package.json')
+const logger = require('./logger')(__filename)
+
+const PrefsFileName = getPrefsFileName('preferences.json')
 
 //------------------------------------------------------------------------------
 exports.create           = create
@@ -36,10 +38,10 @@ class Prefs {
     let contents
 
     try {
-      contents = fs.readFileSync(this.fileName, "utf8")
+      contents = fs.readFileSync(this.fileName, 'utf8')
     }
     catch (e) {
-      console.log("error reading preferences '" + this.fileName + "': " + e)
+      console.log('error reading preferences "' + this.fileName + '": ' + e)
       contents = {}
     }
 
@@ -48,7 +50,7 @@ class Prefs {
       this.data = _.defaults(fileData, this.data)
     }
     catch (e) {
-      console.log("invalid JSON data in preferences '" + this.fileName + "': " + e)
+      console.log('invalid JSON data in preferences "' + this.fileName + '": ' + e)
     }
   }
 
@@ -61,7 +63,7 @@ class Prefs {
       fs.writeFileSync(this.fileName, contents)
     }
     catch (e) {
-      console.log("error writing preferences '" + this.fileName + "': " + e)
+      console.log('error writing preferences "' + this.fileName + '": ' + e)
     }
   }
 
@@ -86,24 +88,24 @@ function getPrefsBasePath() {
   let basePath
 
   try {
-    basePath = app.getPath("home")
+    basePath = app.getPath('home')
   }
   catch(e) {
     basePath = process.env.HOME || process.env.USERPROFILE
   }
 
-  return path.join(basePath, "." + pkg.name)
+  return path.join(basePath, '.' + pkg.name)
 }
 
 //------------------------------------------------------------------------------
-// Licensed under the Apache License, Version 2.0 (the "License")
+// Licensed under the Apache License, Version 2.0 (the 'License')
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
