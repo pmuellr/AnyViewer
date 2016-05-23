@@ -128,7 +128,7 @@ class HandlerClass {
   onPrint() {
     if (!this.menu.browserWindow) return
 
-    this.menu.browserWindow.print({printBackground: true})
+    this.menu.browserWindow.webContents.print({printBackground: true})
   }
 
   //-----------------------------------
