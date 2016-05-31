@@ -22,6 +22,7 @@ class Logger {
 
   _log (type, args) {
     const msg = util.format.apply(util, [].slice.call(args))
-    console.log('[' + type + '] ' + this._baseName + ' - ' + msg)
+    const date = new Date().toISOString().substr(11, 8)
+    console.log(date + ' [' + type + '] ' + this._baseName + ' - ' + msg)
   }
 }

@@ -119,9 +119,11 @@ class Viewer {
     const opts = {
       width:              this.prefs.data.window_width,
       height:             this.prefs.data.window_height,
-      preload:            path.join(__dirname, '../renderer/modules/renderer.js'),
-      'node-integration': false,
-      'zoom-factor':      this.zoomFactor
+      webPreferences: {
+        nodeIntegration:  false,
+        zoomFactor:       this.zoomFactor,
+        preload:          path.join(__dirname, '../renderer/modules/renderer.js')
+      }
     }
 
     if (this.title)            { opts.title = this.title }
@@ -167,6 +169,8 @@ class Viewer {
 
   //------------------------------------------------------------------------------
   loadFileContent(err) {
+    logger.info('loadFileContent(' + err + ')')
+
     let content = null
 
     if (!err) {
@@ -223,6 +227,7 @@ class Viewer {
 
   //----------------------------------------------------------------------------
   runScript(script) {
+    logger.info('runScript()')
     if (!this.browserWindow) return
 
     this.browserWindow.webContents.executeJavaScript(script)
