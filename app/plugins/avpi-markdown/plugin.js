@@ -73,7 +73,8 @@ function configureMarked() {
 //------------------------------------------------------------------------------
 function highlightCode(code, lang) {
   if (!lang || lang == '') {
-    return highlight.highlightAuto(code).value
+    return code
+    // return highlight.highlightAuto(code).value
   }
 
   return highlight.highlightAuto(code, [lang]).value
