@@ -1,5 +1,23 @@
 {
-  "name":        "AnyViewer",
-  "productName": "AnyViewer",
-  "main":        "main/main.js"
+  "name":         "AnyViewer",
+  "productName":  "AnyViewer",
+  "main":         "main/main.js",
+  "description":  "a programmable desktop file viewer built on Electron",
+  "license":      "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url":  "https://github.com/pmuellr/AnyViewer.git"
+  },
+  "dependencies": {
+    "devtron":            "1.3.x",
+    "debug":              "2.2.x",
+    "highlight.js":       "9.6.x",
+    "jquery":             "3.1.x",
+    "marked":             "0.3.x",
+    "mkdirp":             "0.5.x",
+    "tempfile":           "1.1.x",
+    "throttle-debounce":  "1.0.x",
+    "underscore":         "1.8.x",
+    "vinyl":              "1.2.x"
+  }
 }

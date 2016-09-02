@@ -8,9 +8,9 @@ pkg  = require "./package.json"
 ePkg = require "./node_modules/electron-prebuilt/package.json"
 
 #-------------------------------------------------------------------------------
-task "watch",    "watch for source file changes, build", -> taskWatch()
-task "build",    "run a build",                          -> taskBuild()
-task "buildIcns", "build the OS X icns file",            -> taskBuildIcns()
+task "watch",     "watch for source file changes, build", -> taskWatch()
+task "build",     "run a build",                          -> taskBuild()
+task "buildIcns", "build the OS X icns file",             -> taskBuildIcns()
 
 WatchSpec = "app/**/* .eslintrc package.json"
 
@@ -79,13 +79,9 @@ build_app = (oDir) ->
 
   cp "-R", "app/*", oDir
 
-  omDir = "#{oDir}/node_modules"
-  mkdir "-p", omDir
-
-  for dependency of pkg.dependencies
-    cp "-R", "node_modules/#{dependency}", omDir
-
-  rm "-R", "#{omDir}/jquery/src"
+  pushd oDir
+  exec "npm install --production"
+  popd()
 
   fixAboutFile "#{oDir}/renderer/about.md"
   cp "README.md", "#{oDir}/renderer/README.md"

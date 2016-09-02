@@ -20,7 +20,7 @@ plugins
 --------------------------------------------------------------------------------
 
 In order to have a custom HTML renderer for a particular file extension, you'll
-need to install a plugin.  A plugin is an node package installed in a particular
+need to install a plugin.  A plugin is a node package installed in a particular
 location.  That location is the directory named `plugins` in the AnyViewer data
 directory.  The AnyViewer data directory in your home directory, named
 `.AnyViewer`, and stores other preference-y data.
