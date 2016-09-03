@@ -15,6 +15,13 @@ can be rendered by the
 of languages is available
 [here](https://github.com/isagalaev/highlight.js/tree/master/src/languages)).
 
+**AnyViewer viewing it's own README.md**
+
+![Markdown sample](images/Markdown.png)
+
+**AnyViewer viewing one of it's JavaScript source files**
+
+![JavaScript sample](images/JavaScript.png)
 
 plugins
 --------------------------------------------------------------------------------
