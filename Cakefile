@@ -1,11 +1,12 @@
-# Licensed under the Apache License. See footer for details.
-
 require "cakex"
 
 plist = require "plist"
 
 pkg  = require "./package.json"
-ePkg = require "./node_modules/electron-prebuilt/package.json"
+
+electronVersion = "1.3.5"
+
+year = 1900 + new Date().getYear()
 
 #-------------------------------------------------------------------------------
 task "watch",     "watch for source file changes, build", -> taskWatch()
@@ -19,43 +20,88 @@ mkdir "-p", "tmp"
 
 #-------------------------------------------------------------------------------
 taskBuild = ->
-  log "build starting."
+  log "build starting"
 
-  log "linting ..."
-  eslint "app", {silent: true}, (code, output) =>
-    console.log(output)
+  cd process.cwd()
 
-    platArch = "#{process.platform}-#{process.arch}"
+  process.exit(1) if runStandard() != 0
 
-    if platArch is "darwin-x64"
-      mkdir "-p", "build/#{platArch}"
+  log "doing some setup"
+  mkdir "-p", "tmp/app"
+  cp "-R", "app/*", "tmp/app"
 
-      build_darwin_x64 "build/#{platArch}", "AnyViewer-build"
-      build_darwin_x64 "build/#{platArch}", "AnyViewer"
+  fixAboutFile "tmp/app/renderer/about.md"
+  cp "README.md", "tmp/app/renderer/README.md"
 
-      origDir = pwd()
-      log "building distribution archive"
-      cd "build/#{platArch}"
-      exec "zip -q -y -r ../AnyViewer-#{platArch}-#{pkg.version}.zip AnyViewer.app"
-      cd origDir
+  log "running npm install on app"
+  cd "tmp/app"
+  exec "npm install --production"
+  cd "../.."
 
-    if platArch is "linux-x64"
-      mkdir "-p", "build/#{platArch}"
+  options = [
+    "--overwrite"
+    "--out           build"
+    "--version       #{electronVersion}"
+    "--app-copyright 'Copyright 2015-#{year} AnyViewer contributors. All Rights Reserved.'"
+    "--app-version   #{pkg.version}"
+  ].join(" ")
 
-      build_linux_x64 "build/#{platArch}", "AnyViewer-build"
-      build_linux_x64 "build/#{platArch}", "AnyViewer"
+  optionsMac = [
+    "--icon              app/renderer/images/AnyViewer.icns"
+    "--app-bundle-id     org.muellerware.anyviewer"
+    "--app-category-type public.app-category.utilities"
+    "--protocol          anyviewer"
+    "--protocol-name     AnyViewer"
+  ].join(" ")
 
-      origDir = pwd()
-      log "building distribution archive"
-      cd "build/#{platArch}"
-      exec "zip -q -y -r ../AnyViewer-#{platArch}-#{pkg.version}.zip AnyViewer"
-      cd origDir
+  optionsLinux = [
+  ].join(" ")
 
-    log "build done."
+  optionsWin = [
+    "--win32metadata.CompanyName 'AnyViewer contributors'"
+    "--win32metadata.ProductName  AnyViewer"
+  ].join(" ")
+
+  log "building executables"
+  electron_packager "tmp/app --platform darwin --arch x64  #{options} #{optionsMac}"
+  electron_packager "tmp/app --platform linux  --arch ia32 #{options} #{optionsLinux}"
+  electron_packager "tmp/app --platform linux  --arch x64  #{options} #{optionsLinux}"
+  electron_packager "tmp/app --platform win32  --arch ia32 #{options} #{optionsWin}"
+  electron_packager "tmp/app --platform win32  --arch x64  #{options} #{optionsWin}"
+
+  cfBundleFix "AnyViewer", "build/AnyViewer-darwin-x64/AnyViewer.app/Contents/Info.plist"
+
+  buildDirs = [
+    "darwin-x64"
+    "linux-ia32"
+    "linux-x64"
+    "win32-ia32"
+    "win32-x64"
+  ]
+
+  log "building executable archives"
+  for buildDir in buildDirs
+    rm "build/AnyViewer-#{buildDir}/LICENSE"
+    rm "build/AnyViewer-#{buildDir}/LICENSES.chromium.html"
+    rm "build/AnyViewer-#{buildDir}/version"
+
+    origDir = pwd()
+    cd "build/AnyViewer-#{buildDir}"
+    exec "zip -q -y -r ../AnyViewer-#{buildDir}-#{pkg.version}.zip *"
+    cd origDir
+
+  log "build done."
+
+#-------------------------------------------------------------------------------
+runStandard = ->
+  log "standard: checking files"
+  rc = exec("node_modules/.bin/standard")
+  log "standard: A-OK!" if rc.code == 0
+  return rc.code
 
 #-------------------------------------------------------------------------------
 watchIter = ->
-  taskBuild()
+  runStandard()
 
 #-------------------------------------------------------------------------------
 taskWatch = ->
@@ -90,79 +136,13 @@ build_app = (oDir) ->
 fixAboutFile = (aboutFile)->
   aboutContent = cat aboutFile
   aboutContent = aboutContent.replace(/%%app-version%%/g, pkg.version)
-  aboutContent = aboutContent.replace(/%%electron-version%%/g, ePkg.version)
+  aboutContent = aboutContent.replace(/%%electron-version%%/g, electronVersion)
 
   aboutContent.to aboutFile
 
 #-------------------------------------------------------------------------------
-build_darwin_x64 = (dir, name)->
-  log "building #{path.relative process.cwd(), path.join(dir, name)} ..."
-
-  iDir = "node_modules/electron-prebuilt/dist"
-  oDir = dir
-
-  eiDir = "#{iDir}/Electron.app"
-  eoDir = "#{oDir}/Electron.app"
-
-  rm "-Rf", eoDir
-
-  # copy electron, swizzle license/version names, locations
-  cp "-R", eiDir, oDir
-  cp "#{iDir}/LICENSE", "#{eoDir}/LICENSE-electron"
-  cp "#{iDir}/version", "#{eoDir}/version-electron"
-
-  # copy icns
-  cp "app/renderer/images/AnyViewer.icns", "#{eoDir}/Contents/Resources"
-
-  # fix the Info.plist
-  cfBundleFix name, "#{eoDir}/Contents/Info.plist"
-
-  # remove default_app
-  rm "-rf", "#{eoDir}/Contents/Resources/default_app"
-
-  # rename the binary executable
-  mv "#{eoDir}/Contents/MacOS/Electron", "#{eoDir}/Contents/MacOS/#{name}"
-
-  # build the app directory
-  build_app "#{eoDir}/Contents/Resources"
-
-  # rename the .app file
-  rm "-Rf", "#{oDir}/#{name}.app"
-  mv eoDir, "#{oDir}/#{name}.app"
-
-#-------------------------------------------------------------------------------
-build_linux_x64 = (dir, name)->
-  log "building #{path.relative process.cwd(), path.join(dir, name)} ..."
-
-  iDir = "node_modules/electron-prebuilt/dist"
-  oDir = "#{dir}/#{name}"
-
-  rm "-Rf", oDir
-
-  # copy electron, swizzle license/version names, locations
-  cp "-R", "#{iDir}/*", oDir
-  cp "#{iDir}/LICENSE", "#{oDir}/LICENSE-electron"
-  cp "#{iDir}/version", "#{oDir}/version-electron"
-
-  # remove default_app
-  rm "-rf", "#{oDir}/resources/default_app"
-
-  # build the app directory
-  build_app "#{oDir}/resources"
-
-  # rename the .app file
-  mv "#{oDir}/electron", "#{oDir}/#{name}"
-
-#-------------------------------------------------------------------------------
 cfBundleFix = (name, iFile) ->
   pObj = plist.parse( cat iFile )
-
-  pObj.CFBundleDisplayName = name
-  pObj.CFBundleExecutable  = name
-  pObj.CFBundleName        = name
-  pObj.CFBundleIconFile    = "AnyViewer.icns"
-  pObj.CFBundleIdentifier  = "org.muellerware.#{name}"
-  pObj.CFBundleVersion     = pkg.version
 
   pObj.CFBundleDocumentTypes = [
     {
@@ -191,7 +171,7 @@ cfBundleFix = (name, iFile) ->
 
 #-------------------------------------------------------------------------------
 taskBuildIcns = ->
-  log "build icns file..."
+  log "building icns file from png"
 
   iFile = "app/renderer/images/AnyViewer.png"
   oFile = "app/renderer/images/AnyViewer.icns"
@@ -216,17 +196,3 @@ taskBuildIcns = ->
 cleanDir = (dir) ->
   mkdir "-p", dir
   rm "-rf", "#{dir}/*"
-
-#-------------------------------------------------------------------------------
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#-------------------------------------------------------------------------------

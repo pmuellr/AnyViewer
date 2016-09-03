@@ -1,24 +1,21 @@
-// Licensed under the Apache License. See footer for details.
-
 'use strict'
 
-const fs   = require('fs')
+const fs = require('fs')
 const path = require('path')
 
-const _     = require('underscore')
+const _ = require('underscore')
 
-const logger = require('./logger')(__filename)
-const utils  = require('./utils')
-const prefs  = require('./prefs')
+const utils = require('./utils')
+const prefs = require('./prefs')
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.renderHTML = renderHTML
 
-const Plugins    = new Map()
+const Plugins = new Map()
 const Extensions = new Map()
 
-//------------------------------------------------------------------------------
-function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
+// -----------------------------------------------------------------------------
+function renderHTML (iVinyl, oVinyl, userPrefs, cb) {
   cb = utils.onlyCallOnce(cb)
 
   initializeIfRequired()
@@ -26,13 +23,13 @@ function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
   const exts = getExtensions(iVinyl)
 
   let plugin
-  for (let i=0; i<exts.length; i++) {
+  for (let i = 0; i < exts.length; i++) {
     plugin = Extensions.get(exts[i])
     if (plugin) break
   }
 
   if (!plugin) {
-    const errMessage = (exts.length == 1
+    const errMessage = (exts.length === 1
       ? 'no plugin for extension ' + exts[0]
       : 'no plugin for extensions ' + exts.join(', ')
     )
@@ -48,16 +45,15 @@ function renderHTML(iVinyl, oVinyl, userPrefs, cb) {
 
   try {
     plugin.toHTML(iVinyl, oVinyl, cb)
-  }
-  catch(e) {
+  } catch (e) {
     return cb(e)
   }
 
   cb(null)
 }
 
-//------------------------------------------------------------------------------
-function getExtensions(vinyl) {
+// -----------------------------------------------------------------------------
+function getExtensions (vinyl) {
   const regex = /^[^\.]*?\.(.*)/
   const match = vinyl.basename.match(regex)
   if (!match) return [ '' ]
@@ -73,9 +69,9 @@ function getExtensions(vinyl) {
   return result
 }
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 let Initialized = false
-function initializeIfRequired() {
+function initializeIfRequired () {
   if (Initialized) return
   Initialized = true
 
@@ -83,38 +79,35 @@ function initializeIfRequired() {
   loadPlugins('user', path.join(prefs.getPrefsBasePath(), 'plugins'))
 }
 
-//------------------------------------------------------------------------------
-function loadPlugins(type, dir) {
+// -----------------------------------------------------------------------------
+function loadPlugins (type, dir) {
   let entries
   try {
     entries = fs.readdirSync(dir)
-  }
-  catch (e) {
+  } catch (e) {
     console.log('error reading directory `' + dir + '`: ' + e)
     return
   }
 
   for (let entry of entries) {
-    let   stat
+    let stat
     const entryName = path.join(dir, entry)
 
     try {
       stat = fs.statSync(entryName)
-    }
-    catch (e) {
+    } catch (e) {
       console.log('error stating plugin thing `' + entryName + '`: ' + e)
       continue
     }
 
     if (!stat.isDirectory()) continue
 
-    let   pkgJSON
+    let pkgJSON
     const pkgName = path.join(dir, entry, 'package.json')
 
     try {
       pkgJSON = fs.readFileSync(pkgName, 'utf8')
-    }
-    catch (e) {
+    } catch (e) {
       console.log('error reading plugin package `' + pkgName + '`: ' + e)
       continue
     }
@@ -122,8 +115,7 @@ function loadPlugins(type, dir) {
     let pkg = null
     try {
       pkg = JSON.parse(pkgJSON)
-    }
-    catch (e) {
+    } catch (e) {
       console.log('error parsing plugin package `' + pkgName + '`: ' + e)
       continue
     }
@@ -143,13 +135,12 @@ function loadPlugins(type, dir) {
       continue
     }
 
-    let plugin     = null
+    let plugin = null
     let pluginName = path.join(dir, entry, pkg.AnyViewer.plugin)
 
     try {
       plugin = require(pluginName)
-    }
-    catch (e) {
+    } catch (e) {
       console.log('error loading plugin `' + pluginName + '`: ' + e)
       continue
     }
@@ -159,7 +150,7 @@ function loadPlugins(type, dir) {
       continue
     }
 
-    if (!_.isFunction(plugin.toHTML))  {
+    if (!_.isFunction(plugin.toHTML)) {
       console.log('plugin does not export a toHTML() function `' + pluginName + '`')
       continue
     }
@@ -176,17 +167,3 @@ function loadPlugins(type, dir) {
     }
   }
 }
-
-//------------------------------------------------------------------------------
-// Licensed under the Apache License, Version 2.0 (the 'License')
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an 'AS IS' BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//------------------------------------------------------------------------------

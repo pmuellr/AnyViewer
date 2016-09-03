@@ -18,5 +18,5 @@ versions
 --------------------------------------------------------------------------------
 
 <center>
-<img width="80%" src="images/AnyViewer.png">
+<img width="25%" src="images/AnyViewer.png">
 </center>

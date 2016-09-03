@@ -1,47 +1,41 @@
-// Licensed under the Apache License. See footer for details.
-
 'use strict'
 
-const Menu  = require('electron').Menu
+const Menu = require('electron').Menu
 
 const _ = require('underscore')
 
-const logger   = require('./logger')(__filename)
-const viewers  = require('./viewers')
-const utils    = require('./utils')
+const viewers = require('./viewers')
+const utils = require('./utils')
 const MenuData = require('./menu-data')
 
-//------------------------------------------------------------------------------
-exports.loadAppMenu    = loadAppMenu
+// -----------------------------------------------------------------------------
+exports.loadAppMenu = loadAppMenu
 exports.loadWindowMenu = loadWindowMenu
 
-//------------------------------------------------------------------------------
-function loadAppMenu() {
+// -----------------------------------------------------------------------------
+function loadAppMenu () {
   const menuHandler = new AppMenuHandler()
   return menuHandler.menu
 }
 
-//------------------------------------------------------------------------------
-function loadWindowMenu(viewer) {
+// -----------------------------------------------------------------------------
+function loadWindowMenu (viewer) {
   const menuHandler = new WindowMenuHandler(viewer)
   return menuHandler.menu
 }
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 class MenuHandler {
 
-  //----------------------------------------------------------------------------
-  constructor() {}
-
-  //----------------------------------------------------------------------------
-  init() {
+  // ----------------------------------------------------------------------------
+  init () {
     this.createMenu()
   }
 
-  //----------------------------------------------------------------------------
-  createMenu() {
+  // ----------------------------------------------------------------------------
+  createMenu () {
     const template = utils.clone(MenuData.template)
-    const handler  = new MenuData.HandlerClass(this)
+    const handler = new MenuData.HandlerClass(this)
     setMenuHandlers(template, handler)
 
     this.menu = Menu.buildFromTemplate(template)
@@ -49,35 +43,35 @@ class MenuHandler {
 
 }
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 class WindowMenuHandler extends MenuHandler {
-  //----------------------------------------------------------------------------
-  constructor(viewer) {
+  // ----------------------------------------------------------------------------
+  constructor (viewer) {
     super()
 
-    this.viewer        = viewer
+    this.viewer = viewer
     this.browserWindow = viewer.browserWindow
 
     this.init()
   }
 }
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 class AppMenuHandler extends MenuHandler {
-  //----------------------------------------------------------------------------
-  constructor() {
+  // ----------------------------------------------------------------------------
+  constructor () {
     super()
 
     this.init()
   }
 
-  //----------------------------------------------------------------------------
-  get viewer() {
+  // ----------------------------------------------------------------------------
+  get viewer () {
     return viewers.getFocusedViewer()
   }
 
-  //----------------------------------------------------------------------------
-  get browserWindow() {
+  // ----------------------------------------------------------------------------
+  get browserWindow () {
     const viewer = this.viewer
     if (!viewer) return null
 
@@ -85,8 +79,8 @@ class AppMenuHandler extends MenuHandler {
   }
 }
 
-//------------------------------------------------------------------------------
-function setMenuHandlers(menuData, handler) {
+// -----------------------------------------------------------------------------
+function setMenuHandlers (menuData, handler) {
   if (!menuData) return
 
   if (_.isString(menuData)) return
@@ -94,7 +88,7 @@ function setMenuHandlers(menuData, handler) {
   if (_.isBoolean(menuData)) return
 
   if (_.isArray(menuData)) {
-    for (let i=0; i<menuData.length; i++) {
+    for (let i = 0; i < menuData.length; i++) {
       setMenuHandlers(menuData[i], handler)
     }
     return
@@ -103,21 +97,18 @@ function setMenuHandlers(menuData, handler) {
   for (let propName in menuData) {
     const propVal = menuData[propName]
 
-    if (propName == 'on_click') {
+    if (propName === 'on_click') {
       menuData.click = getMenuHandlerMethod(handler, propVal)
-    }
-
-    else {
+    } else {
       setMenuHandlers(propVal, handler)
     }
   }
-
 }
 
-//------------------------------------------------------------------------------
-function getMenuHandlerMethod(handler, name) {
-  return function() {
-    const fn   = handler[name]
+// -----------------------------------------------------------------------------
+function getMenuHandlerMethod (handler, name) {
+  return function () {
+    const fn = handler[name]
     const args = _.toArray(arguments)
 
     if (fn == null) {
@@ -128,17 +119,3 @@ function getMenuHandlerMethod(handler, name) {
     fn.apply(handler, args)
   }
 }
-
-//------------------------------------------------------------------------------
-// Licensed under the Apache License, Version 2.0 (the 'License')
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an 'AS IS' BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//------------------------------------------------------------------------------

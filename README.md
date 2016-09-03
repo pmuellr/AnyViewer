@@ -47,6 +47,7 @@ install
 You can download a pre-built binary from the
 [releases page](https://github.com/pmuellr/AnyViewer/releases).
 
+
 Mac OS X notes
 --------------------------------------------------------------------------------
 
@@ -64,6 +65,24 @@ Once open, you can open other viewer windows through the
 
 You can associate AnyViewer with other file extensions, by [following these
 instructions](http://www.imore.com/how-change-default-apps-os-x).
+
+
+Windows notes
+--------------------------------------------------------------------------------
+
+Windows builds are not tested, they are the build outputs of
+[`electron-packager`](https://npmjs.org/package/electron-packager).
+Please [create an issue](https://github.com/pmuellr/AnyViewer/issues) for
+problems encountered.
+
+
+Linux notes
+--------------------------------------------------------------------------------
+
+Linux builds are not tested, they are the build outputs of
+[`electron-packager`](https://npmjs.org/package/electron-packager).
+Please [create an issue](https://github.com/pmuellr/AnyViewer/issues) for
+problems encountered.
 
 
 plugins
@@ -172,9 +191,7 @@ building
 * run `npm install` to install dependencies
 * run `npm run build` to build the execute
 
-A "build" version of the executable is available in the `build` directory,
-to make it easier to test a development version while you have a stable version
-installed at the same time, on your boxen.
+Executables and archives for all platforms will be in the `build` directory.
 
 
 hacking
@@ -204,10 +221,6 @@ Awesome!  We're happy that you want to contribute.
 
 Make sure that you're read and understand the
 [Code of Conduct](CODE_OF_CONDUCT.md).
-
-At this time, there are no builds for Windows or Linux, but if someone would
-like to contribute those, that would be awesome.  It's expected that changes
-would need to be changed to the build scripts, and possibly the runtime code.
 
 
 license
