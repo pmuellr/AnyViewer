@@ -1,9 +1,6 @@
 AnyViewer - a programmable desktop file viewer built on Electron
 ================================================================================
 
-usage
---------------------------------------------------------------------------------
-
 AnyViewer is a desktop application to view files, built on
 [Electron](http://electron.atom.io/).
 The application only displays HTML, so AnyViewer needs to be programmed to
@@ -23,8 +20,54 @@ of languages is available
 
 ![JavaScript sample](images/JavaScript.png)
 
-plugins
+
+features
+================================================================================
+
+* Font-size changes can be made via menu and shortcuts, the same way you
+  change "zoom" pages in the Chrome web browser.  The last change you made
+  is set as the default size for all future viewer windows.
+
+* The last change you made to the height and width of the windows are set
+  as the default values for all future viewer windows.
+
+* A file which is being viewed is tracked for changes; when the file changes
+  on disk, the view will be reloaded with the new contents.
+
+* Print files with background colors and images, with a font-size that
+  renders the text fairly readable on a tablet when printed to PDF file.
+
+* You can open a Chrome Dev Tools window via menu and shortcut, if you like to
+  or need to peek behind the curtains.
+
+
+install
+================================================================================
+
+You can download a pre-built binary from the
+[releases page](https://github.com/pmuellr/AnyViewer/releases).
+
+Mac OS X notes
 --------------------------------------------------------------------------------
+
+Unzip the archive, and move the resulting `AnyViewer.app` folder to an
+appropriate location.
+
+AnyViewer associates itself with `.md` files when installed.  So, you can:
+
+* double-click an `.md` file from Finder
+* run  `open someFileName.md` from the Terminal
+* drag / drop a file from Finder onto an AnyViewer icon in your Dock
+
+Once open, you can open other viewer windows through the
+**File** / **Open File ...** menu item.
+
+You can associate AnyViewer with other file extensions, by [following these
+instructions](http://www.imore.com/how-change-default-apps-os-x).
+
+
+plugins
+================================================================================
 
 In order to have a custom HTML renderer for a particular file extension, you'll
 need to install a plugin.  A plugin is a node package installed in a particular
@@ -48,11 +91,11 @@ have the following properties:
 The plugin's primary entrypoint should be a module which exports the following
 properties:
 
-* `toHTML`: a function of shape `toHTML(vinylIn, vinylOut, cb)`.  
+* `toHTML`: a function of shape `toHTML(vinylIn, vinylOut, cb)`.
   This function is invoked to convert the original file being opened to HTML.
   The `vinyl*` parameters are
   [vinyl File objects](https://www.npmjs.com/package/vinyl),
-  probably just with the file name values.  
+  probably just with the file name values.
 
   * `vinylIn` is the file that was requested to be open.
   * `vinylOut` is an output file which will be rendered
@@ -77,16 +120,21 @@ properties:
 
 
 sample plugin
---------------------------------------------------------------------------------
+================================================================================
 
-By default, AnyViewer can view `.html` with syntax highlighting.  This sample
-plugin views `.html` file as the rendered HTML.  It's not terribly practical -
+By default, AnyViewer will view `.html` files with syntax highlighting of the
+HTML source.
+
+Described below is a sample plugin which overrides that viewer, with one that
+renders the HTML as a web page.
+
+It's not terribly practical -
 this plugin does not fix relatively referenced resources (images, css files,
 etc), so those files won't be loaded when the HTML is rendered in Anyviewer.
 But, it's a simple example.
 
-These files should be stored in the directory `.AnyViewer/plugins/avpi-html`
-in your home directory.
+These files should be stored in the directory `~/.AnyViewer/plugins/avpi-html`
+(in your home directory).
 
 ### file `package.json`
 
@@ -117,38 +165,8 @@ function toHTML(iVinyl, oVinyl, cb) {
 ```
 
 
-AnyViewer features
---------------------------------------------------------------------------------
-
-* Font-size changes can be made via menu and shortcuts, the same way you
-  change "zoom" pages in the Chrome web browser.  The last change you made
-  is set as the default size for all future viewer windows.
-
-* The last change you made to the height and width of the windows are set
-  as the default values for all future viewer windows.
-
-* You can open a Chrome Dev Tools window via menu and shortcut.
-
-* A file which is being viewed is tracked for changes; when the file changes
-  on disk, the view will be reloaded with the new contents.
-
-* Print files with background colors and images, with a font-size that
-  renders the text fairly readable on a tablet when printed to PDF file.
-
-install
---------------------------------------------------------------------------------
-
-You can download a pre-built binary from the
-[releases page](https://github.com/pmuellr/AnyViewer/releases).
-
-You can associate AnyViewer with particular file types, by following these
-instructions:
-
-* for [Mac OS X](http://www.imore.com/how-change-default-apps-os-x)
-
-
 building
---------------------------------------------------------------------------------
+================================================================================
 
 * clone this repo
 * run `npm install` to install dependencies
@@ -160,7 +178,7 @@ installed at the same time, on your boxen.
 
 
 hacking
---------------------------------------------------------------------------------
+================================================================================
 
 This project uses [cake](http://coffeescript.org/#cake) as it's
 build tool.  To rebuild the project continuously, use the command
@@ -179,17 +197,22 @@ npm run cake -- <command here>
 Run `npm run cake` to see the other commands available in the `Cakefile`.
 
 
-license
---------------------------------------------------------------------------------
+contributing
+================================================================================
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Awesome!  We're happy that you want to contribute.
+
+Make sure that you're read and understand the
+[Code of Conduct](CODE_OF_CONDUCT.md).
+
+At this time, there are no builds for Windows or Linux, but if someone would
+like to contribute those, that would be awesome.  It's expected that changes
+would need to be changed to the build scripts, and possibly the runtime code.
+
+
+license
+================================================================================
+
+The AnyViewer specific code in this application is licensed under the Apache License, Version 2.0. You may obtain a copy of the License at
 
 <http://www.apache.org/licenses/LICENSE-2.0>
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
