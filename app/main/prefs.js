@@ -21,7 +21,6 @@ function create (defaultValues) { return new Prefs(defaultValues) }
 
 // -----------------------------------------------------------------------------
 class Prefs {
-
   // ----------------------------------------------------------------------------
   constructor (defaultValues) {
     defaultValues = defaultValues || {}
@@ -60,7 +59,6 @@ class Prefs {
       console.log('error writing preferences "' + this.fileName + '": ' + e)
     }
   }
-
 }
 
 // -----------------------------------------------------------------------------

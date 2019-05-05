@@ -4,7 +4,7 @@ plist = require "plist"
 
 pkg  = require "./package.json"
 
-electronVersion = "1.3.5"
+electronVersion = "5.0.1"
 
 year = 1900 + new Date().getYear()
 
@@ -41,7 +41,7 @@ taskBuild = ->
   options = [
     "--overwrite"
     "--out           build"
-    "--version       #{electronVersion}"
+    "--electron-version  #{electronVersion}"
     "--app-copyright 'Copyright 2015-#{year} AnyViewer contributors. All Rights Reserved.'"
     "--app-version   #{pkg.version}"
   ].join(" ")

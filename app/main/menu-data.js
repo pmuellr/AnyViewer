@@ -51,8 +51,8 @@ function getTemplate () {
     {
       label: 'View',
       submenu: [
-//      { label: 'Back',            accelerator: 'Command+[',     on_click: 'onGoBack' },
-//      { label: 'Forward',         accelerator: 'Command+]',     on_click: 'onGoForward' },
+        // { label: 'Back',            accelerator: 'Command+[',     on_click: 'onGoBack' },
+        // { label: 'Forward',         accelerator: 'Command+]',     on_click: 'onGoForward' },
         { label: 'Reload', accelerator: 'Command+R', on_click: 'onReload' },
         { label: 'Enter Fullscreen', on_click: 'onEnterFullscreen' },
         { label: 'Actual Size', accelerator: 'Command+0', on_click: 'onZoomActualSize' },
@@ -75,7 +75,6 @@ function getTemplate () {
 
 // -----------------------------------------------------------------------------
 class HandlerClass {
-
   // -----------------------------------
   constructor (menu) {
     this.menu = menu
@@ -105,7 +104,7 @@ class HandlerClass {
       Dialog.showOpenDialog(options, onOpenFileCB)
     }
 
-  // -----------------------------------
+    // -----------------------------------
     function onOpenFileCB (fileNames) {
       if (!fileNames) return
 
@@ -124,7 +123,7 @@ class HandlerClass {
   onPrint () {
     if (!this.menu.browserWindow) return
 
-    this.menu.browserWindow.webContents.print({printBackground: true})
+    this.menu.browserWindow.webContents.print({ printBackground: true })
   }
 
   // -----------------------------------

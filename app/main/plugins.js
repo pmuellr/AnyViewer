@@ -54,7 +54,7 @@ function renderHTML (iVinyl, oVinyl, userPrefs, cb) {
 
 // -----------------------------------------------------------------------------
 function getExtensions (vinyl) {
-  const regex = /^[^\.]*?\.(.*)/
+  const regex = /^[^.]*?\.(.*)/
   const match = vinyl.basename.match(regex)
   if (!match) return [ '' ]
 

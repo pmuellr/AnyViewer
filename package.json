@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "cakex": "1.0.x",
-    "coffee-script": "1.10.x",
-    "electron-packager": "8.0.x",
-    "plist": "2.0.x",
-    "standard": "8.0.x"
+    "coffee-script": "1.12.x",
+    "electron-packager": "13.1.x",
+    "plist": "3.0.x",
+    "standard": "12.0.x"
   }
 }

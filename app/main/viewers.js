@@ -65,7 +65,6 @@ function getViewerFromBrowserWindow (browserWindow) {
 
 // -----------------------------------------------------------------------------
 class Viewer {
-
   // ----------------------------------------------------------------------------
   constructor (fileName, options) {
     logger.info('creating Viewer for %s', fileName)
@@ -86,8 +85,8 @@ class Viewer {
   renderFile (next) {
     logger.info('rendering file %s', this.fileName)
 
-    const iVinyl = new Vinyl({path: this.fullFileName})
-    const oVinyl = new Vinyl({path: this.htmlFileName})
+    const iVinyl = new Vinyl({ path: this.fullFileName })
+    const oVinyl = new Vinyl({ path: this.htmlFileName })
     const prefs = this.prefs
 
     try {
@@ -161,7 +160,7 @@ class Viewer {
 
     const self = this
 
-    fs.watchFile(this.fullFileName, {interval: 1000}, function (curr, prev) {
+    fs.watchFile(this.fullFileName, { interval: 1000 }, function (curr, prev) {
       self.fileModified(curr, prev)
     })
 
@@ -266,7 +265,6 @@ class Viewer {
     this.prefs.data.window_height = size[1]
     this.prefs.store()
   }
-
 }
 
 // -----------------------------------------------------------------------------
